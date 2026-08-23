@@ -104,7 +104,7 @@ def ShowFileDialog(self,msg,show_open=True):
 
 def ShowHaltDialog(msg=None):
 	msgBox = QMessageBox()
-	msgBox.setIconPixmap(QPixmap(DISCONNECT_DIALOG_IMAGE))
+	msgBox.setIconPixmap(QPixmap(WARN_ICON))
 	msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
 	msgBox.setText("<b>Halt script execution?</b>")
 	if msg!= None:

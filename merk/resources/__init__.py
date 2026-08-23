@@ -232,6 +232,12 @@ PAUSE_FOR_WINDOWBAR_REBUILD_ON_RESIZE = 200
 USER_MENU_AWAY_ELIDE = 29
 USER_MENU_HOSTMASK_ELIDE = 25
 
+MENUBAR_ENTRY_SPACING = 8
+
+WINDOWBAR_ENTRY_SPACING = 8
+WINDOWBAR_ADDON_HEIGHT = 12
+WINDOWBAR_SPILLOVER_TRIGGER_SIZE = 0.75
+
 # Icons
 
 # Light mode icons
@@ -243,7 +249,6 @@ OPTIONS_ICON = ":/icon-options.png"
 BOLD_ICON = ":/icon-bold.png"
 ITALIC_ICON = ":/icon-italic.png"
 MDI_BACKGROUND = ":/gui-background.png"
-LENGTH_ICON = ":/icon-length.png"
 
 # Dark mode icons
 DARK_ROUND_UNCHECKED_ICON = ":/icon-dark_runchecked.png"
@@ -256,6 +261,7 @@ DARK_ITALIC_ICON = ":/icon-dark_italic.png"
 DARK_MDI_BACKGROUND = ":/gui-dark_background.png"
 
 # All other icons
+LENGTH_ICON = ":/icon-length.png"
 APPLICATION_ICON = ":/icon-app.png"
 NEXT_ICON = ":/icon-next.png"
 PREVIOUS_ICON = ":/icon-previous.png"
@@ -367,6 +373,7 @@ LIGHTBULB_ICON = ":/icon-lightbulb.png"
 COMMAND_ICON = ":/icon-command.png"
 DOWN_ICON = ":/icon-down.png"
 UP_ICON = ":/icon-up.png"
+WARN_ICON = ":/icon-warn.png"
 
 # User list status icons
 ADMIN_USER = ":/gui-admin.png"

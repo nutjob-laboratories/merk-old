@@ -461,7 +461,7 @@ class Merk(QMainWindow):
 		fm = QFontMetrics(f)
 		fheight = fm.height()
 			
-		self.windowbar.setFixedHeight(fheight+12)
+		self.windowbar.setFixedHeight(fheight+WINDOWBAR_ADDON_HEIGHT)
 
 		self.windowbar.hide()
 
@@ -502,7 +502,7 @@ class Merk(QMainWindow):
 				c = window.widget()
 				window_titles.append(c.name)
 
-				if self.raw_size_of_list(window_titles)<(self.width()*0.75):
+				if self.raw_size_of_list(window_titles)<(self.width()*WINDOWBAR_SPILLOVER_TRIGGER_SIZE):
 					full.append(window)
 				else:
 					abbv.append(window)
@@ -4673,17 +4673,27 @@ class Merk(QMainWindow):
 
 	def settingsDarkMode(self):
 		msgBox = QMessageBox()
-		msgBox.setIconPixmap(QPixmap(SETTINGS_ICON))
+		msgBox.setIconPixmap(QPixmap(WARN_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
-		if config.DARK_MODE:
-			msgBox.setText("Deactivating dark mode requires a restart!\nThis will disconnect from all servers.\nRestart now?")
+		if self.connected_to_something:
+			if config.DARK_MODE:
+				msgBox.setText(f"<b>Deactivating dark mode requires a restart!<br>This will disconnect from all servers.</b><br><br>Restart {APPLICATION_NAME} now?")
+			else:
+				msgBox.setText(f"<b>Activating dark mode requires a restart!<br>This will disconnect from all servers.</b><br><br>Restart {APPLICATION_NAME} now?")
 		else:
-			msgBox.setText("Activating dark mode requires a restart!\nThis will disconnect from all servers.\nRestart now?")
+			if config.DARK_MODE:
+				msgBox.setText(f"<b>Deactivating dark mode requires a restart!</b><br><br>Restart {APPLICATION_NAME} now?")
+			else:
+				msgBox.setText(f"<b>Activating dark mode requires a restart!</b><br><br>Restart {APPLICATION_NAME} now?")
 		msgBox.setWindowTitle("Restart")
 
 		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
 		msgBox.addButton("Cancel", QMessageBox.RejectRole)
 		msgBox.setDefaultButton(default_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
 
 		rval = msgBox.exec()
 		if rval != QMessageBox.RejectRole:
@@ -5490,7 +5500,7 @@ class Merk(QMainWindow):
 							if hostid in user.COMMANDS:
 								entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 							else:
-								entry = QAction(QIcon(EDIT_ICON),"Create connection script",self)
+								entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
 							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
 							sm.addAction(entry)
 

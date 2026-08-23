@@ -1366,7 +1366,7 @@ class Window(QMainWindow):
 					if hostid in user.COMMANDS:
 						entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",menu)
 					else:
-						entry = QAction(QIcon(EDIT_ICON),"Create connection script",menu)
+						entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",menu)
 					entry.triggered.connect(lambda state,h=hostid: self.parent.openEditorConnect(h))
 					menu.addAction(entry)
 
@@ -1534,54 +1534,55 @@ class Window(QMainWindow):
 
 						menu.addMenu(fMenu)
 
-						cdMenu = menu.addMenu(QIcon(LOG_ICON),"Chat display")
+				if self.window_type==CHANNEL_WINDOW:
+					cdMenu = menu.addMenu(QIcon(LOG_ICON),"Chat display")
 
-						entry = QAction(QIcon(UP_ICON),"Scroll chat to top",menu)
-						entry.triggered.connect(lambda state: self.moveChatToTop())
-						cdMenu.addAction(entry)
-						scrollbar = self.chat.verticalScrollBar()
-						if scrollbar.value() == scrollbar.minimum(): entry.setEnabled(False)
+					entry = QAction(QIcon(UP_ICON),"Scroll chat to top",menu)
+					entry.triggered.connect(lambda state: self.moveChatToTop())
+					cdMenu.addAction(entry)
+					scrollbar = self.chat.verticalScrollBar()
+					if scrollbar.value() == scrollbar.minimum(): entry.setEnabled(False)
 
-						entry = QAction(QIcon(DOWN_ICON),"Scroll chat to bottom",menu)
-						entry.triggered.connect(lambda state,u=True: self.moveChatToBottom(u))
-						cdMenu.addAction(entry)
-						scrollbar = self.chat.verticalScrollBar()
-						if scrollbar.value() == scrollbar.maximum(): entry.setEnabled(False)
+					entry = QAction(QIcon(DOWN_ICON),"Scroll chat to bottom",menu)
+					entry.triggered.connect(lambda state,u=True: self.moveChatToBottom(u))
+					cdMenu.addAction(entry)
+					scrollbar = self.chat.verticalScrollBar()
+					if scrollbar.value() == scrollbar.maximum(): entry.setEnabled(False)
 
-						cdMenu.addSeparator()
+					cdMenu.addSeparator()
 
-						entry = QAction(QIcon(CLEAR_ICON),"Clear chat display",menu)
-						entry.triggered.connect(self.clearChat)
-						cdMenu.addAction(entry)
+					entry = QAction(QIcon(CLEAR_ICON),"Clear chat display",menu)
+					entry.triggered.connect(self.clearChat)
+					cdMenu.addAction(entry)
 
-						entry = QAction(QIcon(RELOAD_ICON),"Re-render chat display",menu)
-						entry.triggered.connect(self.rerenderChatLogMenu)
-						cdMenu.addAction(entry)
+					entry = QAction(QIcon(RELOAD_ICON),"Re-render chat display",menu)
+					entry.triggered.connect(self.rerenderChatLogMenu)
+					cdMenu.addAction(entry)
 
-						entry = QAction(QIcon(LOG_ICON),"Save log",menu)
-						entry.triggered.connect(self.menuSaveLogs)
-						cdMenu.addAction(entry)
+					entry = QAction(QIcon(LOG_ICON),"Save log",menu)
+					entry.triggered.connect(self.menuSaveLogs)
+					cdMenu.addAction(entry)
 
-						copyMenu = menu.addMenu(QIcon(CLIPBOARD_ICON),"Copy to clipboard")
+					copyMenu = menu.addMenu(QIcon(CLIPBOARD_ICON),"Copy to clipboard")
 
-						act = QAction(QIcon(PRIVATE_ICON),"Channel name", self)
-						act.triggered.connect(lambda : self.menuPasteClipboard(self.name))
+					act = QAction(QIcon(PRIVATE_ICON),"Channel name", self)
+					act.triggered.connect(lambda : self.menuPasteClipboard(self.name))
+					copyMenu.addAction(act)
+
+					if self.client.hostname:
+						act = QAction(QIcon(NETWORK_ICON),"Server hostname", self)
+						act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.hostname}"))
 						copyMenu.addAction(act)
 
-						if self.client.hostname:
-							act = QAction(QIcon(NETWORK_ICON),"Server hostname", self)
-							act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.hostname}"))
+					if self.client.network:
+						if self.client.network.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
+							act = QAction(QIcon(NETWORK_ICON),"Server network", self)
+							act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.network}"))
 							copyMenu.addAction(act)
 
-						if self.client.network:
-							if self.client.network.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
-								act = QAction(QIcon(NETWORK_ICON),"Server network", self)
-								act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.network}"))
-								copyMenu.addAction(act)
-
-						act = QAction(QIcon(CONSOLE_ICON),"Server information", self)
-						act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.server}:{self.client.port}"))
-						copyMenu.addAction(act)
+					act = QAction(QIcon(CONSOLE_ICON),"Server information", self)
+					act.triggered.connect(lambda : self.menuPasteClipboard(f"{self.client.server}:{self.client.port}"))
+					copyMenu.addAction(act)
 
 				if self.window_type==PRIVATE_WINDOW:
 
@@ -1714,7 +1715,7 @@ class Window(QMainWindow):
 					if cscript!=None:
 						entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
 					else:
-						entry = QAction(QIcon(EDIT_ICON),"Create channel script",menu)
+						entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
 					entry.triggered.connect(lambda state,h=self.encodeScriptFilename(): self.parent.newEditorWindowFile(h))
 					menu.addAction(entry)
 
@@ -1723,16 +1724,9 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 				menu.addSeparator()
+
 				entry = QAction(QIcon(CHANNEL_ICON),f"Leave {self.name}",menu)
-				msg = config.DEFAULT_QUIT_MESSAGE
-				if config.ENABLE_MARKDOWN_MARKUP: msg = markdown_to_irc(msg)
-				if config.ENABLE_IRC_COLOR_MARKUP: msg = inject_irc_colors(msg)
-				if config.ENABLE_EMOJI_SHORTCODES: msg = emojize(msg,config.EMOJI_LANGUAGE)
-				if config.ENABLE_ASCIIMOJI_SHORTCODES: msg = asciimojize(msg)
-				if config.INTERPOLATE_ALIASES_INTO_QUIT_MESSAGE:
-					commands.buildTemporaryAliases(self.parent,self)
-					msg = commands.interpolateAliases(msg)
-				entry.triggered.connect(lambda state,u=self.name,w=msg: self.client.leave(u,w))
+				entry.triggered.connect(self.close)
 				f = entry.font()
 				f.setBold(True)
 				entry.setFont(f)
@@ -1753,6 +1747,7 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 				menu.addSeparator()
+
 				entry = QAction(QIcon(CLOSE_ICON),"Close private chat window",menu)
 				entry.triggered.connect(self.close)
 				f = entry.font()

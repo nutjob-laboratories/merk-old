@@ -5000,7 +5000,7 @@ class Dialog(QDialog):
 
 		self.stack.addWidget(self.awayPage)
 
-		self.promptAway = QCheckBox(f"Prompt for away message if one is not provided\nwith the {config.ISSUE_COMMAND_SYMBOL}away command or when pressing the\n\"Set status to away\" button on the server\nsubwindow toolbar",self)
+		self.promptAway = QCheckBox(f"Prompt for away message if one is not provided\nwith the {config.ISSUE_COMMAND_SYMBOL}away command or when pressing the\n\"Set status to away\" button on the server\nsubwindow toolbar or menus",self)
 		if config.PROMPT_FOR_AWAY_MESSAGE: self.promptAway.setChecked(True)
 		self.promptAway.stateChanged.connect(self.changedSetting)
 

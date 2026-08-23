@@ -8,6 +8,7 @@ What's new:
 - **The channel banlist is now useful**. Users with channel privileges can now unban users directly from the banlist, or just copy the banlist entry to the clipboard. All entries in the banlist can be unbanned at once, or copied to the clipboard. For users without channel privileges, the banlist does not offer these options.
 - **The channel mode menu is now "prettier" for unprivileged users**. Icons have been added to the different recognized modes to give hints to the user about what the mode does.
 - **Most menus have been "cleaned up"**. This includes main application menus, and all right click menus.
+- **Most dialogs have been "cleaned up"**. Most dialogs for asking the user a question or for a behavior choice have been made clearer and "prettier".
 - **Subwindows can now be navigated with shortcuts**. The "Windows" menu contains specific shortcuts for IRC subwindows, and moving through the subwindow list can be done by pressing `Alt+]` to move to the "next" subwindow and `Alt+[` to move to the "previous" subwindow. To cascade all subwindows, use "Alt+C", and to tile them, use "Alt+T". Shortcuts have also been added for the Log Manager subwindow (`Alt+L`), channel list subwindows (`Ctrl+Alt+NUMBER`), and the README subwindow (`Alt+R`). All of these shortcuts can be enabled (the default) or disabled from the "Settings" dialog or with the `/config` command.
 - **Various server status controls have been added to the "Windows" menu**. The ability to toggle "away/back" statuses, to change the user's nickname, and to join a channel have been added to the "Windows" menu. Users can toggle all of these entries in the "Settings" dialog.
 - **Many, *many* bugfixes**.
@@ -137,6 +138,20 @@ What's new:
   entry menu for channel subwindows.
 * Tweaked/cleaned up many of the windowbar's right click menus for specific
   subwindow entries.
+* Bugfix: right click menus for windowbar entries are now no longer different
+  for the "show icons" version.
+* Bugfix: leaving a channel from the windowbar and chat display right click
+  menus will no longer display an error in the client.
+* Added an option to refresh the server channel list to the right click menu
+  for server windows in the windowbar.
+* Added an option to run a script to server window right click menus in the
+  windowbar.
+* Tweaked the "restart" dialog when selecting "dark mode" from the settings
+  menu.
+* Added a new icon: "warn", to be used with both the "restart for dark mode"
+  and the "halt" dialogs.
+* Bugfix: the channel chat display right click menu was not showing all items
+  when certain options were active.
 
 |==============================================================================|
 |                              PLUGIN API CHANGES                              |

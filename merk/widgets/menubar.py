@@ -334,6 +334,16 @@ class wMenuButton(QPushButton):
 				self.contextList.triggered.connect(self.window.showChannelList)
 				menu.addAction(self.contextList)
 
+			if config.SHOW_LIST_REFRESH_BUTTON_ON_SERVER_WINDOWS:
+				self.contextRefresh = QAction(QIcon(REFRESH_ICON),"Refresh channel list",self)
+				self.contextRefresh.triggered.connect(self.window.refreshChannelList)
+				menu.addAction(self.contextRefresh)
+
+			if config.SCRIPTING_ENGINE_ENABLED:
+				self.contextRun = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
+				self.contextRun.triggered.connect(lambda state: self.window.loadScript(True))
+				menu.addAction(self.contextRun)
+
 			menu.addSeparator()
 
 			if config.ENABLE_STYLE_EDITOR:
@@ -347,7 +357,7 @@ class wMenuButton(QPushButton):
 				if hostid in user.COMMANDS:
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 				else:
-					entry = QAction(QIcon(EDIT_ICON),"Create connection script",self)
+					entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
 				entry.triggered.connect(lambda state,h=hostid: self.window.parent.openEditorConnect(h))
 				menu.addAction(entry)
 
@@ -362,7 +372,12 @@ class wMenuButton(QPushButton):
 
 			menu.addSeparator()
 
-			entry = QAction(QIcon(CLOSE_ICON),f"Disconnect from {self.window.client.server}:{self.window.client.port}",self)
+			if self.window.client.hostname:
+				sname = f"{self.window.client.hostname}"
+			else:
+				sname = f"{self.window.client.server}:{self.window.client.port}"
+
+			entry = QAction(QIcon(CLOSE_ICON),f"Disconnect from {sname}",self)
 			entry.triggered.connect(self.window.disconnect)
 			f = entry.font()
 			f.setBold(True)
@@ -373,6 +388,8 @@ class wMenuButton(QPushButton):
 				self.contextNick.setEnabled(False)
 				self.contextJoin.setEnabled(False)
 				self.contextList.setEnabled(False)
+				self.contextRefresh.setEnabled(False)
+				self.contextRun.setEnabled(False)
 
 		if self.window.window_type==CHANNEL_WINDOW or self.window.window_type==PRIVATE_WINDOW:
 
@@ -405,7 +422,7 @@ class wMenuButton(QPushButton):
 				if cscript!=None:
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
 				else:
-					entry = QAction(QIcon(EDIT_ICON),"Create channel script",menu)
+					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
 				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowFile(h))
 				menu.addAction(entry)
 
@@ -421,15 +438,7 @@ class wMenuButton(QPushButton):
 			menu.addSeparator()
 
 			entry = QAction(QIcon(CHANNEL_ICON),f"Leave {self.window.name}",self)
-			msg = config.DEFAULT_QUIT_MESSAGE
-			if config.ENABLE_MARKDOWN_MARKUP: msg = markdown_to_irc(msg)
-			if config.ENABLE_IRC_COLOR_MARKUP: msg = inject_irc_colors(msg)
-			if config.ENABLE_EMOJI_SHORTCODES: msg = emojize(msg,config.EMOJI_LANGUAGE)
-			if config.ENABLE_ASCIIMOJI_SHORTCODES: msg = asciimojize(msg)
-			if config.INTERPOLATE_ALIASES_INTO_QUIT_MESSAGE:
-					commands.buildTemporaryAliases(self.window.parent,self.window)
-					msg = commands.interpolateAliases(msg)
-			entry.triggered.connect(lambda state,u=self.window.name,w=msg: self.window.client.leave(u,w))
+			entry.triggered.connect(self.close_subwindow)
 			f = entry.font()
 			f.setBold(True)
 			entry.setFont(f)
@@ -546,18 +555,23 @@ class wIconMenuButton(QPushButton):
 		self.subwindow.close()
 		self.window.parent.initWindowbar()
 
+	def hide_window(self):
+		self.subwindow.hide()
+		self.window.parent.initWindowbar()
+
+	def show_window(self):
+		self.subwindow.show()
+		self.window.parent.initWindowbar()
+
+	def clear_unread(self,i,h):
+		self.window.parent.remove_unread_message(i,h)
+		self.window.parent.remove_unread_mention(i,h)
+
 	def show_context_menu(self,position):
 
 		if not config.WINDOWBAR_ENTRY_MENU: return
 
 		menu = QMenu(self)
-
-		if self.window.window_type==SERVER_WINDOW or self.window.window_type==CHANNEL_WINDOW or self.window.window_type==PRIVATE_WINDOW:
-			if config.ENABLE_STYLE_EDITOR:
-				if not config.FORCE_DEFAULT_STYLE:
-					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
-					entry.triggered.connect(self.window.pressedStyleButton)
-					menu.addAction(entry)
 		
 		if self.window.window_type==SERVER_WINDOW:
 
@@ -574,18 +588,50 @@ class wIconMenuButton(QPushButton):
 				self.contextList.triggered.connect(self.window.showChannelList)
 				menu.addAction(self.contextList)
 
+			if config.SHOW_LIST_REFRESH_BUTTON_ON_SERVER_WINDOWS:
+				self.contextRefresh = QAction(QIcon(REFRESH_ICON),"Refresh channel list",self)
+				self.contextRefresh.triggered.connect(self.window.refreshChannelList)
+				menu.addAction(self.contextRefresh)
+
+			if config.SCRIPTING_ENGINE_ENABLED:
+				self.contextRun = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
+				self.contextRun.triggered.connect(lambda state: self.window.loadScript(True))
+				menu.addAction(self.contextRun)
+
+			menu.addSeparator()
+
+			if config.ENABLE_STYLE_EDITOR:
+				if not config.FORCE_DEFAULT_STYLE:
+					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+					entry.triggered.connect(self.window.pressedStyleButton)
+					menu.addAction(entry)
+
 			if config.SCRIPTING_ENGINE_ENABLED:
 				hostid = self.window.client.server+":"+str(self.window.client.port)
 				if hostid in user.COMMANDS:
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 				else:
-					entry = QAction(QIcon(EDIT_ICON),"Create connection script",self)
+					entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
 				entry.triggered.connect(lambda state,h=hostid: self.window.parent.openEditorConnect(h))
+				menu.addAction(entry)
+
+			if self.subwindow.isVisible():
+				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide window",self)
+				entry.triggered.connect(self.hide_window)
+				menu.addAction(entry)
+			else:
+				entry = QAction(QIcon(SUBWINDOW_ICON),"Show window",self)
+				entry.triggered.connect(self.show_window)
 				menu.addAction(entry)
 
 			menu.addSeparator()
 
-			entry = QAction(QIcon(CLOSE_ICON),"Disconnect from server",self)
+			if self.window.client.hostname:
+				sname = f"{self.window.client.hostname}"
+			else:
+				sname = f"{self.window.client.server}:{self.window.client.port}"
+
+			entry = QAction(QIcon(CLOSE_ICON),f"Disconnect from {sname}",self)
 			entry.triggered.connect(self.window.disconnect)
 			f = entry.font()
 			f.setBold(True)
@@ -596,6 +642,8 @@ class wIconMenuButton(QPushButton):
 				self.contextNick.setEnabled(False)
 				self.contextJoin.setEnabled(False)
 				self.contextList.setEnabled(False)
+				self.contextRefresh.setEnabled(False)
+				self.contextRun.setEnabled(False)
 
 		if self.window.window_type==CHANNEL_WINDOW or self.window.window_type==PRIVATE_WINDOW:
 
@@ -617,16 +665,37 @@ class wIconMenuButton(QPushButton):
 
 			menu.addSeparator()
 
-			entry = QAction(QIcon(CHANNEL_ICON),"Leave channel",self)
-			msg = config.DEFAULT_QUIT_MESSAGE
-			if config.ENABLE_MARKDOWN_MARKUP: msg = markdown_to_irc(msg)
-			if config.ENABLE_IRC_COLOR_MARKUP: msg = inject_irc_colors(msg)
-			if config.ENABLE_EMOJI_SHORTCODES: msg = emojize(msg,config.EMOJI_LANGUAGE)
-			if config.ENABLE_ASCIIMOJI_SHORTCODES: msg = asciimojize(msg)
-			if config.INTERPOLATE_ALIASES_INTO_QUIT_MESSAGE:
-					commands.buildTemporaryAliases(self.window.parent,self.window)
-					msg = commands.interpolateAliases(msg)
-			entry.triggered.connect(lambda state,u=self.window.name,w=msg: self.window.client.leave(u,w))
+			if config.ENABLE_STYLE_EDITOR:
+				if not config.FORCE_DEFAULT_STYLE:
+					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+					entry.triggered.connect(self.window.pressedStyleButton)
+					menu.addAction(entry)
+
+			if config.SCRIPTING_ENGINE_ENABLED:
+				cscript = commands.find_script(self.window.encodeScriptFilename(),None)
+				if cscript!=None:
+					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
+				else:
+					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
+				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowFile(h))
+				menu.addAction(entry)
+
+			if self.subwindow.isVisible():
+				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide window",self)
+				entry.triggered.connect(self.hide_window)
+				menu.addAction(entry)
+			else:
+				entry = QAction(QIcon(SUBWINDOW_ICON),"Show window",self)
+				entry.triggered.connect(self.show_window)
+				menu.addAction(entry)
+
+			menu.addSeparator()
+
+			entry = QAction(QIcon(CHANNEL_ICON),f"Leave {self.window.name}",self)
+			entry.triggered.connect(self.close_subwindow)
+			f = entry.font()
+			f.setBold(True)
+			entry.setFont(f)
 			menu.addAction(entry)
 
 		if self.window.window_type==LIST_WINDOW:
@@ -639,8 +708,29 @@ class wIconMenuButton(QPushButton):
 
 			menu.addSeparator()
 
+			if self.window.window_type==CHANNEL_WINDOW or self.window.window_type==SERVER_WINDOW or self.window.window_type==PRIVATE_WINDOW:
+				if config.ENABLE_STYLE_EDITOR:
+					if not config.FORCE_DEFAULT_STYLE:
+						entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+						entry.triggered.connect(self.window.pressedStyleButton)
+						menu.addAction(entry)
+
+			if self.subwindow.isVisible():
+				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide window",self)
+				entry.triggered.connect(self.hide_window)
+				menu.addAction(entry)
+			else:
+				entry = QAction(QIcon(SUBWINDOW_ICON),"Show window",self)
+				entry.triggered.connect(self.show_window)
+				menu.addAction(entry)
+
+			menu.addSeparator()
+
 			entry = QAction(QIcon(CLOSE_ICON),"Close window",self)
 			entry.triggered.connect(self.close_subwindow)
+			f = entry.font()
+			f.setBold(True)
+			entry.setFont(f)
 			menu.addAction(entry)
 
 		menu.exec_(self.mapToGlobal(position))
@@ -709,7 +799,7 @@ def generate_window_toolbar(self):
 	toolbar_menu_style = toolbar_menu_style.replace('$HIGH',mhigh)
 
 	toolbar.setAllowedAreas(Qt.TopToolBarArea | Qt.BottomToolBarArea)
-	toolbar.setStyleSheet(''' QToolBar { spacing: 8px; } ''')
+	toolbar.setStyleSheet(f''' QToolBar {{ spacing: {WINDOWBAR_ENTRY_SPACING}px; }} ''')
 
 	return toolbar
 
@@ -742,7 +832,7 @@ def generate_menubar(self):
 	toolbar_menu_style = toolbar_menu_style.replace('$HIGH',mhigh)
 
 	toolbar.setAllowedAreas(Qt.TopToolBarArea | Qt.BottomToolBarArea)
-	toolbar.setStyleSheet(''' QToolBar { spacing: 8px; } ''')
+	toolbar.setStyleSheet(f''' QToolBar {{ spacing: {MENUBAR_ENTRY_SPACING}px; }} ''')
 
 	f = toolbar.font()
 	fm = QFontMetrics(f)
@@ -940,9 +1030,9 @@ class Windowbar(QToolBar):
 		self.hiddenMenu.addAction(entry)
 
 		if config.SHOW_HIDDEN_PRIVATE_WINDOWS_IN_WINDOWBAR:
-			entry = QAction(QIcon(self.parent.checked_icon),"Private chats subwindows", self)
+			entry = QAction(QIcon(self.parent.checked_icon),"Private chat subwindows", self)
 		else:
-			entry = QAction(QIcon(self.parent.unchecked_icon),"Private chats subwindows", self)
+			entry = QAction(QIcon(self.parent.unchecked_icon),"Private chat subwindows", self)
 		entry.triggered.connect(self.showHiddenPrivate)
 		self.hiddenMenu.addAction(entry)
 
