@@ -128,6 +128,15 @@ What's new:
   setting in mode setting notifications.
 * Changed the script editor icon.
 * Changed the log manager icon.
+* Added an option to run a script on a server window to the "Windows" menu.
+* Bugfix: the "edit/create connection script" entry in the "Windows" menu would
+  appear even if scripting was disabled.
+* Added an option to all chat and server window right click menus to run a
+  script on the window.
+* Added an option to edit/create a channel script to the windowbar right click
+  entry menu for channel subwindows.
+* Tweaked/cleaned up many of the windowbar's right click menus for specific
+  subwindow entries.
 
 |==============================================================================|
 |                              PLUGIN API CHANGES                              |

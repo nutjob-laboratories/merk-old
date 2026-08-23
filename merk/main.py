@@ -5480,6 +5480,20 @@ class Merk(QMainWindow):
 
 						sm.addSeparator()
 
+						if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
+							entry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
+							entry.triggered.connect(lambda state: sw.widget().loadScript(True))
+							sm.addAction(entry)
+
+						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
+							hostid = c.client.server+":"+str(c.client.port)
+							if hostid in user.COMMANDS:
+								entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
+							else:
+								entry = QAction(QIcon(EDIT_ICON),"Create connection script",self)
+							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
+							sm.addAction(entry)
+
 						if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
 							entry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
 							entry.triggered.connect(lambda state: sw.widget().changeNick())
@@ -5508,15 +5522,6 @@ class Merk(QMainWindow):
 								entry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
 								entry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
 								sm.addAction(entry)
-
-						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU:
-							hostid = c.client.server+":"+str(c.client.port)
-							if hostid in user.COMMANDS:
-								entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-							else:
-								entry = QAction(QIcon(EDIT_ICON),"Create connection script",self)
-							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
-							sm.addAction(entry)
 
 						sm.addSeparator()
 

@@ -1298,6 +1298,15 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
+				if config.SCRIPTING_ENGINE_ENABLED:
+					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
+					entry.triggered.connect(lambda state: self.loadScript(True))
+					menu.addAction(entry)
+
+					if not self.client.registered: entry.setEnabled(False)
+
+				menu.addSeparator()
+
 				entry = QAction(QIcon(UP_ICON),"Scroll log to top",menu)
 				entry.triggered.connect(lambda state: self.moveChatToTop())
 				menu.addAction(entry)
@@ -1313,6 +1322,8 @@ class Window(QMainWindow):
 				entry = QAction(QIcon(CLEAR_ICON),"Clear log display",menu)
 				entry.triggered.connect(self.clearChat)
 				menu.addAction(entry)
+
+				if not self.client.registered: entry.setEnabled(False)
 
 				menu.addSeparator()
 
@@ -1364,6 +1375,7 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 				menu.addSeparator()
+
 				entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),f"Disconnect from {self.client.server}:{self.client.port}",menu)
 				entry.triggered.connect(self.disconnect)
 				f = entry.font()
@@ -1372,6 +1384,15 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 			if self.window_type!=SERVER_WINDOW:
+
+				menu.addSeparator()
+
+				if config.SCRIPTING_ENGINE_ENABLED:
+					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
+					entry.triggered.connect(lambda state: self.loadScript(True))
+					menu.addAction(entry)
+
+					if not self.client.registered: entry.setEnabled(False)
 
 				menu.addSeparator()
 
@@ -1734,6 +1755,9 @@ class Window(QMainWindow):
 				menu.addSeparator()
 				entry = QAction(QIcon(CLOSE_ICON),"Close private chat window",menu)
 				entry.triggered.connect(self.close)
+				f = entry.font()
+				f.setBold(True)
+				entry.setFont(f)
 				menu.addAction(entry)
 
 		action = menu.exec_(self.chat.mapToGlobal(location))
@@ -2522,7 +2546,6 @@ class Window(QMainWindow):
 			else:
 				display_hostmask = user_hostmask
 
-		statusLayout = QHBoxLayout()
 		if user_is_admin:
 			ICON = ADMIN_USER
 			if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS: ICON = BOT_ADMIN_USER
@@ -2556,21 +2579,18 @@ class Window(QMainWindow):
 		# Bold channel status text, if it's going to be displayed
 		OTHER_TEXT = f"<b>{OTHER_TEXT}</b>"
 
-		statusLayout.addStretch()
-
 		is_hidden = False
 		if user_hostmask!=None:
 			if user_hostmask.lower() in config.IGNORE_LIST: is_hidden = True
 		if user_nick.lower() in config.IGNORE_LIST: is_hidden = True
 
 		shown_box = False
-		away_elide_size = 29
 
 		if user_nick==self.client.nickname:
 
 			if user_hostmask!=None:
 				if config.ELIDE_HOSTMASK_IN_USERLIST_CONTEXT:
-					dstring = elide_text(user_hostmask,25)
+					dstring = elide_text(user_hostmask,USER_MENU_HOSTMASK_ELIDE)
 				else:
 					dstring = user_hostmask	
 			else:
@@ -2600,7 +2620,7 @@ class Window(QMainWindow):
 					if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text!='': status_text = status_text + " (Bot)"
 					if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text=='': status_text = "Bot"
 					if status_text!='':
-						entry = noSpacePlainTextAction(self,f"<small><center><b>{status_text}</b></center></small>")
+						entry = noSpacePlainTextAction(self,f"<center><b><small>{status_text}</small></b></center>")
 						self.userlist_menu.addAction(entry)
 
 					if is_hidden:
@@ -2615,7 +2635,7 @@ class Window(QMainWindow):
 							shown_box = True
 
 					if config.ELIDE_AWAY_MSG_IN_USERLIST_CONTEXT:
-						ea = elide_text(self.client.away_msg,away_elide_size)
+						ea = elide_text(self.client.away_msg,USER_MENU_AWAY_ELIDE)
 						e = BoxPlainTextAction(self,"Away",f"<small><center>{ea}</center></small>")
 						if len(ea)!=len(self.client.away_msg):
 							self.userlist_menu.setToolTipsVisible(True)
@@ -2644,7 +2664,7 @@ class Window(QMainWindow):
 					if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text!='': status_text = status_text + " (Bot)"
 					if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text=='': status_text = "Bot"
 					if status_text!='':
-						entry = noSpacePlainTextAction(self,f"<small><center><b>{status_text}</b></center></small>")
+						entry = noSpacePlainTextAction(self,f"<center><b><small>{status_text}</small></b></center>")
 						self.userlist_menu.addAction(entry)
 
 					if is_hidden:
@@ -2693,7 +2713,7 @@ class Window(QMainWindow):
 				if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text!='': status_text = status_text + " (Bot)"
 				if user_nick in self.client.bots and config.SHOW_BOTS_IN_USERLISTS and status_text=='': status_text = "Bot"
 				if status_text!='':
-					entry = noSpacePlainTextAction(self,f"<small><center><b>{status_text}</b></center></small>")
+					entry = noSpacePlainTextAction(self,f"<center><b><small>{status_text}</small></b></center>")
 					self.userlist_menu.addAction(entry)
 
 				if is_hidden:
@@ -2720,7 +2740,7 @@ class Window(QMainWindow):
 				away_msg = self.away[user_nick]
 
 				if config.ELIDE_AWAY_MSG_IN_USERLIST_CONTEXT:
-					ea = elide_text(away_msg,away_elide_size)
+					ea = elide_text(away_msg,USER_MENU_AWAY_ELIDE)
 					e = BoxPlainTextAction(self,"Away",f"<small><center>{ea}</center></small>")
 					if len(ea)!=len(away_msg):
 						self.userlist_menu.setToolTipsVisible(True)
@@ -3583,7 +3603,7 @@ class Window(QMainWindow):
 				else:
 					self.nick_display.setText(self.client.nickname+" ")
 				if config.SHOW_AWAY_MESSAGE_IN_NICK_DISPLAY_TOOLTIP:
-					self.nick_display.setToolTip(f"Away: {self.client.away_msg}")
+					self.nick_display.setToolTip(f"{self.client.away_msg}")
 				else:
 					self.nick_display.setToolTip("")
 			else:
@@ -3758,6 +3778,7 @@ class Window(QMainWindow):
 			if config.CLOSING_SERVER_WINDOW_DISCONNECTS:
 				self.disconnect()
 				event.ignore()
+				self.parent.MDI.activateNextSubWindow()
 			else:
 				event.ignore()
 				self.parent.hideSubWindow(self.subwindow_id)

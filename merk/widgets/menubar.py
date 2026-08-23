@@ -318,13 +318,6 @@ class wMenuButton(QPushButton):
 		if not config.WINDOWBAR_ENTRY_MENU: return
 
 		menu = QMenu(self)
-
-		if self.window.window_type==SERVER_WINDOW or self.window.window_type==CHANNEL_WINDOW or self.window.window_type==PRIVATE_WINDOW:
-			if config.ENABLE_STYLE_EDITOR:
-				if not config.FORCE_DEFAULT_STYLE:
-					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
-					entry.triggered.connect(self.window.pressedStyleButton)
-					menu.addAction(entry)
 		
 		if self.window.window_type==SERVER_WINDOW:
 
@@ -340,6 +333,14 @@ class wMenuButton(QPushButton):
 				self.contextList = QAction(QIcon(LIST_ICON),"Server channel list",self)
 				self.contextList.triggered.connect(self.window.showChannelList)
 				menu.addAction(self.contextList)
+
+			menu.addSeparator()
+
+			if config.ENABLE_STYLE_EDITOR:
+				if not config.FORCE_DEFAULT_STYLE:
+					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+					entry.triggered.connect(self.window.pressedStyleButton)
+					menu.addAction(entry)
 
 			if config.SCRIPTING_ENGINE_ENABLED:
 				hostid = self.window.client.server+":"+str(self.window.client.port)
@@ -391,6 +392,23 @@ class wMenuButton(QPushButton):
 
 		if self.window.window_type==CHANNEL_WINDOW:
 
+			menu.addSeparator()
+
+			if config.ENABLE_STYLE_EDITOR:
+				if not config.FORCE_DEFAULT_STYLE:
+					entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+					entry.triggered.connect(self.window.pressedStyleButton)
+					menu.addAction(entry)
+
+			if config.SCRIPTING_ENGINE_ENABLED:
+				cscript = commands.find_script(self.window.encodeScriptFilename(),None)
+				if cscript!=None:
+					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
+				else:
+					entry = QAction(QIcon(EDIT_ICON),"Create channel script",menu)
+				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowFile(h))
+				menu.addAction(entry)
+
 			if self.subwindow.isVisible():
 				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide window",self)
 				entry.triggered.connect(self.hide_window)
@@ -424,6 +442,15 @@ class wMenuButton(QPushButton):
 			menu.addAction(entry)
 
 		if self.window.window_type!=CHANNEL_WINDOW and self.window.window_type!=SERVER_WINDOW:
+
+			menu.addSeparator()
+
+			if self.window.window_type==CHANNEL_WINDOW or self.window.window_type==SERVER_WINDOW or self.window.window_type==PRIVATE_WINDOW:
+				if config.ENABLE_STYLE_EDITOR:
+					if not config.FORCE_DEFAULT_STYLE:
+						entry = QAction(QIcon(STYLE_ICON),"Edit text style",self)
+						entry.triggered.connect(self.window.pressedStyleButton)
+						menu.addAction(entry)
 
 			if self.subwindow.isVisible():
 				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide window",self)
