@@ -3978,6 +3978,28 @@ class Merk(QMainWindow):
 
 		return w
 
+	def newEditorWindowSave(self,filename):
+		w = MerkSubwindow(self)
+		w.setWidget(widgets.ScriptEditor(filename,self,w,False,False,None,True))
+		w.resize(config.DEFAULT_SUBWINDOW_WIDTH,config.DEFAULT_SUBWINDOW_HEIGHT)
+		w.setWindowIcon(QIcon(SCRIPT_ICON))
+		w.setAttribute(Qt.WA_DeleteOnClose)
+		w.setBackground(config.SUBWINDOW_BACKGROUND)
+		self.MDI.addSubWindow(w)
+		self.toolsMenu.close()
+		self.buildWindowsMenu()
+		w.show()
+
+		if config.RUBBER_BAND_RESIZE:
+			w.setOption(QMdiSubWindow.RubberBandResize, True)
+
+		if config.RUBBER_BAND_MOVE:
+			w.setOption(QMdiSubWindow.RubberBandMove, True)
+
+		if config.MAXIMIZE_SUBWINDOWS_ON_CREATION: w.showMaximized()
+
+		return w
+
 	def openEditor(self,filename):
 		for window in self.getAllEditorWindows():
 			if hasattr(window,"widget"):
@@ -4704,11 +4726,11 @@ class Merk(QMainWindow):
 				config.DARK_MODE = True
 			self.save_config()
 			if is_running_from_pyinstaller():
-				subprocess.Popen([sys.executable] + [])
+				subprocess.Popen([sys.executable] + ["-R"])
 				self.close()
 				app.exit()
 			else:
-				os.execl(sys.executable, sys.executable,sys.argv[0])
+				os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
 
 	def settingsTimestamps(self):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -5497,10 +5519,7 @@ class Merk(QMainWindow):
 
 						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
 							hostid = c.client.server+":"+str(c.client.port)
-							if hostid in user.COMMANDS:
-								entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-							else:
-								entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
+							entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
 							sm.addAction(entry)
 
@@ -5819,7 +5838,7 @@ class Merk(QMainWindow):
 			f = self.font()
 			fm = QFontMetrics(f)
 			fheight = fm.height()
-			self.menuTool.setFixedHeight(fheight+15)
+			self.menuTool.setFixedHeight(fheight+MENUBAR_ADDON_HEIGHT)
 			self.menuTool.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
 			menubar.add_toolbar_menu(self.menuTool,config.MAIN_MENU_IRC_NAME,self.mainMenu)

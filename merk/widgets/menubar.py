@@ -354,10 +354,7 @@ class wMenuButton(QPushButton):
 
 			if config.SCRIPTING_ENGINE_ENABLED:
 				hostid = self.window.client.server+":"+str(self.window.client.port)
-				if hostid in user.COMMANDS:
-					entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-				else:
-					entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
+				entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 				entry.triggered.connect(lambda state,h=hostid: self.window.parent.openEditorConnect(h))
 				menu.addAction(entry)
 
@@ -423,7 +420,7 @@ class wMenuButton(QPushButton):
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
 				else:
 					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
-				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowFile(h))
+				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
 				menu.addAction(entry)
 
 			if self.subwindow.isVisible():
@@ -608,10 +605,7 @@ class wIconMenuButton(QPushButton):
 
 			if config.SCRIPTING_ENGINE_ENABLED:
 				hostid = self.window.client.server+":"+str(self.window.client.port)
-				if hostid in user.COMMANDS:
-					entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-				else:
-					entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",self)
+				entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 				entry.triggered.connect(lambda state,h=hostid: self.window.parent.openEditorConnect(h))
 				menu.addAction(entry)
 
@@ -677,7 +671,7 @@ class wIconMenuButton(QPushButton):
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
 				else:
 					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
-				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowFile(h))
+				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
 				menu.addAction(entry)
 
 			if self.subwindow.isVisible():

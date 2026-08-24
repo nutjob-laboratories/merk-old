@@ -2,17 +2,6 @@
 |                                   0.052.200                                  |
 |------------------------------------------------------------------------------|
 
-What's new:
-
-- **MERK is much more user friendly**. Dialogs are much clearer about how exactly they work and what they do, as are various menus.
-- **The channel banlist is now useful**. Users with channel privileges can now unban users directly from the banlist, or just copy the banlist entry to the clipboard. All entries in the banlist can be unbanned at once, or copied to the clipboard. For users without channel privileges, the banlist does not offer these options.
-- **The channel mode menu is now "prettier" for unprivileged users**. Icons have been added to the different recognized modes to give hints to the user about what the mode does.
-- **Most menus have been "cleaned up"**. This includes main application menus, and all right click menus.
-- **Most dialogs have been "cleaned up"**. Most dialogs for asking the user a question or for a behavior choice have been made clearer and "prettier".
-- **Subwindows can now be navigated with shortcuts**. The "Windows" menu contains specific shortcuts for IRC subwindows, and moving through the subwindow list can be done by pressing `Alt+]` to move to the "next" subwindow and `Alt+[` to move to the "previous" subwindow. To cascade all subwindows, use "Alt+C", and to tile them, use "Alt+T". Shortcuts have also been added for the Log Manager subwindow (`Alt+L`), channel list subwindows (`Ctrl+Alt+NUMBER`), and the README subwindow (`Alt+R`). All of these shortcuts can be enabled (the default) or disabled from the "Settings" dialog or with the `/config` command.
-- **Various server status controls have been added to the "Windows" menu**. The ability to toggle "away/back" statuses, to change the user's nickname, and to join a channel have been added to the "Windows" menu. Users can toggle all of these entries in the "Settings" dialog.
-- **Many, *many* bugfixes**.
-
 |==============================================================================|
 |                              APPLICATION CHANGES                             |
 |==============================================================================|
@@ -149,9 +138,25 @@ What's new:
 * Tweaked the "restart" dialog when selecting "dark mode" from the settings
   menu.
 * Added a new icon: "warn", to be used with both the "restart for dark mode"
-  and the "halt" dialogs.
+  and the "halt" dialogs. It's also used in the "do restart?" dialog in the
+  "Settings" dialog option.
 * Bugfix: the channel chat display right click menu was not showing all items
   when certain options were active.
+* Turning on "dark mode" from the "Settings" menu now restarts MERK and goes
+  directly to the app without showing the "connect" dialog.
+* Added a dialog asking the user if they want to restart the app to the
+  "apply & restart" option in the "Settings" dialog. If the user chooses NOT to
+  restart, they will be returned to the "Settings" dialog; nothing will be
+  saved, and the app will NOT restart.
+* Added an "auto-away after 4 hours" option to the "Settings" dialog.
+* Added a "save logs every 4 hours" option to the "Settings" dialog.
+* Creating a channel script from various right click menus now actually creates
+  the script, and saves it before editing. Channel scripts only execute if
+  there's anything in them.
+* Removed the "disconnect" icon from the resource file, as it was only used in
+  one place, and that place had the icon replaced with something else.
+* The "Run" menu in the script editor now shows the appropriate icon of the
+  window type.
 
 |==============================================================================|
 |                              PLUGIN API CHANGES                              |

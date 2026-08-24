@@ -46,6 +46,7 @@ from .. import commands
 from .. import user
 from .. import plugins
 from .extendedmenuitem import MenuLabel,menuHtml
+from .plain_text import PlainIconTextAction
 
 class Window(QMainWindow):
 
@@ -794,7 +795,7 @@ class Window(QMainWindow):
 		else:
 			return False
 
-	def __init__(self,filename=None,parent=None,subwindow=None,python=False,blank=False,contents=None):
+	def __init__(self,filename=None,parent=None,subwindow=None,python=False,blank=False,contents=None,save=False):
 		super(Window, self).__init__(parent)
 
 		self.filename = filename
@@ -808,6 +809,7 @@ class Window(QMainWindow):
 		self.blank = blank
 		self.contents = contents
 		self.initial_launch = True
+		self.do_immediate_save = save
 
 		self.editing_user_script = False
 		self.current_user_script = None
@@ -1275,6 +1277,9 @@ class Window(QMainWindow):
 		if self.python and not self.filename and not self.blank:
 			self.doNewPlugin()
 
+		if self.do_immediate_save:
+			self.doFileSave()
+
 		self.changed = False
 		self.updateApplicationTitle()
 		self.editor.setFocus()
@@ -1511,6 +1516,7 @@ class Window(QMainWindow):
 						cname = f"{c.client.server}"
 				else:
 					cname = c.name
+
 				runmenuLabel = MenuLabel( menuHtml(RUN_MENU_ICON,"Run on "+cname+"&nbsp;","<b>Host:</b> "+c.name+" ("+network+")<br>Execute on server window",CUSTOM_MENU_ICON_SIZE) )
 				runmenuAction = QWidgetAction(self)
 				runmenuAction.setDefaultWidget(runmenuLabel)
@@ -1531,10 +1537,12 @@ class Window(QMainWindow):
 					if c.window_type==CHANNEL_WINDOW:
 						ctype = "channel"
 						channels = channels + 1
+						icon = CHANNEL_MENU_ICON
 					else:
 						ctype = "private chat"
 						privates = privates + 1
-					runmenuLabel = MenuLabel( menuHtml(RUN_MENU_ICON,"Run on "+c.name+"&nbsp;","<b>Host:</b> "+cname+" ("+network+")<br>Execute on "+ctype+" window",CUSTOM_MENU_ICON_SIZE) )
+						icon = PRIVATE_MENU_ICON
+					runmenuLabel = MenuLabel( menuHtml(icon,"Run on "+c.name+"&nbsp;","<b>Host:</b> "+cname+" ("+network+")<br>Execute on "+ctype+" window",CUSTOM_MENU_ICON_SIZE) )
 					runmenuAction = QWidgetAction(self)
 					runmenuAction.setDefaultWidget(runmenuLabel)
 					runmenuLabel.clicked.connect(lambda u=c: self.executeScript(u))
@@ -1567,9 +1575,8 @@ class Window(QMainWindow):
 			return
 
 		# If there's no connected servers...
-		entry = QAction(QIcon(DISCONNECT_ICON),"No connected servers",self)
-		entry.setEnabled(False)
-		self.runMenu.addAction(entry)
+		action = PlainIconTextAction(QIcon(HIDE_ICON), "No connected servers", self)
+		self.runMenu.addAction(action)
 
 	def doNewPlugin(self):
 

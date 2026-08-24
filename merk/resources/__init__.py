@@ -233,6 +233,7 @@ USER_MENU_AWAY_ELIDE = 29
 USER_MENU_HOSTMASK_ELIDE = 25
 
 MENUBAR_ENTRY_SPACING = 8
+MENUBAR_ADDON_HEIGHT = 15
 
 WINDOWBAR_ENTRY_SPACING = 8
 WINDOWBAR_ADDON_HEIGHT = 12
@@ -271,7 +272,6 @@ CHANNEL_ICON = ":/icon-channel.png"
 QUIT_ICON = ":/icon-quit.png"
 NETWORK_ICON = ":/icon-network.png"
 CONNECT_ICON = ":/icon-connect.png"
-DISCONNECT_ICON = ":/icon-disconnect.png"
 INFO_ICON = ":/icon-info.png"
 BOOKMARK_ICON = ":/icon-bookmark.png"
 SECURE_ICON = ":/icon-secure.png"

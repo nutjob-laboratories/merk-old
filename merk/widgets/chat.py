@@ -198,6 +198,7 @@ class Window(QMainWindow):
 						f = open(cscript,"r")
 						script = f.read()
 						f.close()
+						# Only execute the script if there's something in it
 						if len(script.strip())>0:
 							args = [f"{self.name}",f"{self.client.server}:{self.client.port}"]
 							self.executeScript(script,cscript,args)
@@ -1716,7 +1717,7 @@ class Window(QMainWindow):
 						entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
 					else:
 						entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
-					entry.triggered.connect(lambda state,h=self.encodeScriptFilename(): self.parent.newEditorWindowFile(h))
+					entry.triggered.connect(lambda state,h=self.encodeScriptFilename(): self.parent.newEditorWindowSave(h))
 					menu.addAction(entry)
 
 				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide channel window",menu)

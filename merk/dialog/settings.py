@@ -1805,6 +1805,7 @@ class Dialog(QDialog):
 		if newInterval=="15 minutes": self.interval = 900000
 		if newInterval=="2 hours": self.interval = 7200000
 		if newInterval=="3 hours": self.interval = 10800000
+		if newInterval=="4 hours": self.interval = 14400000
 
 		self.selector.setFocus()
 		self.changed.show()
@@ -2161,15 +2162,25 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def do_restart(self, link):
-		self.save(True)
-
-		if is_running_from_pyinstaller():
-			subprocess.Popen([sys.executable] + ["-R"])
-			self.parent.close()
-			self.parent.app.exit()
-		else:
-			os.execl(sys.executable, sys.executable, sys.argv[0], "-R")
-			sys.exit()
+		msgBox = QMessageBox()
+		msgBox.setIconPixmap(QPixmap(WARN_ICON))
+		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
+		msgBox.setText(f"Save settings and restart {APPLICATION_NAME} now?")
+		msgBox.setWindowTitle("Restart")
+		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
+		msgBox.addButton("Cancel", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(default_button)
+		rval = msgBox.exec()
+		if rval != QMessageBox.RejectRole:
+			self.save(True)
+			if is_running_from_pyinstaller():
+				subprocess.Popen([sys.executable] + ["-R"])
+				self.parent.close()
+				self.parent.app.exit()
+			else:
+				os.execl(sys.executable, sys.executable, sys.argv[0], "-R")
+				sys.exit()
+		return
 
 	def playSound(self):
 		QSound.play(self.sound)
@@ -2220,6 +2231,7 @@ class Dialog(QDialog):
 		if newInterval=="15 minutes": self.awayInterval = 900
 		if newInterval=="2 hours": self.awayInterval = 7200
 		if newInterval=="3 hours": self.awayInterval = 10800
+		if newInterval=="4 hours": self.awayInterval = 14400
 
 		self.selector.setFocus()
 		self.changed.show()
@@ -5028,13 +5040,17 @@ class Dialog(QDialog):
 		if config.AUTOAWAY_TIME==10800:
 			self.autoawayInterval.addItem("3 hours")
 			added = True
-		if added==False: self.autoawayInterval.addItem(f"{config.AUTOAWAY_TIME} sec")
+		if config.AUTOAWAY_TIME==14400:
+			self.autoawayInterval.addItem("4 hours")
+			added = True
+		if added==False: self.autoawayInterval.addItem(f"{config.AUTOAWAY_TIME} seconds")
 		if config.AUTOAWAY_TIME!=300: self.autoawayInterval.addItem("5 minutes")
 		if config.AUTOAWAY_TIME!=900: self.autoawayInterval.addItem("15 minutes")
 		if config.AUTOAWAY_TIME!=1800: self.autoawayInterval.addItem("30 minutes")
 		if config.AUTOAWAY_TIME!=3600: self.autoawayInterval.addItem("1 hour")
 		if config.AUTOAWAY_TIME!=7200: self.autoawayInterval.addItem("2 hours")
 		if config.AUTOAWAY_TIME!=10800: self.autoawayInterval.addItem("3 hours")
+		if config.AUTOAWAY_TIME!=14400: self.autoawayInterval.addItem("4 hours")
 		self.autoawayInterval.currentIndexChanged.connect(self.autoawayChange)
 
 		intervalBox = QHBoxLayout()
@@ -5648,12 +5664,16 @@ class Dialog(QDialog):
 		if config.LOG_SAVE_INTERVAL==10800000:
 			self.logInterval.addItem("3 hours")
 			added = True
+		if config.LOG_SAVE_INTERVAL==14400000:
+			self.logInterval.addItem("4 hours")
+			added = True
 		if added==False: self.logInterval.addItem(f"{config.LOG_SAVE_INTERVAL} ms")
 		if config.LOG_SAVE_INTERVAL!=900000: self.logInterval.addItem("15 minutes")
 		if config.LOG_SAVE_INTERVAL!=1800000: self.logInterval.addItem("30 minutes")
 		if config.LOG_SAVE_INTERVAL!=3600000: self.logInterval.addItem("hour")
 		if config.LOG_SAVE_INTERVAL!=7200000: self.logInterval.addItem("2 hours")
 		if config.LOG_SAVE_INTERVAL!=10800000: self.logInterval.addItem("3 hours")
+		if config.LOG_SAVE_INTERVAL!=14400000: self.logInterval.addItem("4 hours")
 		self.logInterval.currentIndexChanged.connect(self.intervalChange)
 
 		intervalBox = QHBoxLayout()
