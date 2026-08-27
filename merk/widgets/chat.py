@@ -763,29 +763,33 @@ class Window(QMainWindow):
 			self.status = self.statusBar()
 			self.status.setStyleSheet("QStatusBar::item { border: none; }")
 
+			if self.window_type==CHANNEL_WINDOW:
+				wid = f"{self.name}</b> on <b>"
+			else:
+				wid = f"</b>Chat with <b>{self.name}</b> on <b>"
+
 			# Here, we display the server the chat window is associated
 			# with, as well as how the client is connected to it (using
 			# SSL/TLS or not) and other information
-			fm = QFontMetrics(self.app.font())
 			if self.client.kwargs["ssl"]:
 				if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
 					netlink = get_network_link(self.client.network)
 					if netlink!=None:
-						self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> (<a href=\""+netlink+"\">"+self.client.network+"</a>)</small>")
+						self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> (<a href=\"{netlink}\">{self.client.network}</a>) via <b>SSL/TLS</b></small>")
 					else:
-						self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+						self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> ({self.client.network}) via <b>SSL/TLS</b></small>")
 				else:
-					self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+					self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> ({self.client.network}) via <b>SSL/TLS</b></small>")
 				self.status_server.setOpenExternalLinks(True)
 			else:
 				if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
 					netlink = get_network_link(self.client.network)
 					if netlink!=None:
-						self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> (<a href=\""+netlink+"\">"+self.client.network+"</a>)</small>")
+						self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> (<a href=\"{netlink}\">{self.client.network}</a>) via <b>TCP/IP</b></small>")
 					else:
-						self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+						self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> ({self.client.network}) via <b>TCP/IP</b></small>")
 				else:
-					self.status_server = QLabel("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+					self.status_server = QLabel(f"<small><b>{wid}{self.client.hostname}</b> ({self.client.network}) via <b>TCP/IP</b></small>")
 				self.status_server.setOpenExternalLinks(True)
 			self.status.addPermanentWidget(self.status_server,0)
 
@@ -1377,7 +1381,12 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
-				entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),f"Disconnect from {self.client.server}:{self.client.port}",menu)
+				if self.client.hostname:
+					mname = f"{self.client.hostname}"
+				else:
+					mname = f"{self.client.server}:{self.client.port}"
+
+				entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),f"Disconnect from {mname}",menu)
 				entry.triggered.connect(self.disconnect)
 				f = entry.font()
 				f.setBold(True)
@@ -2281,30 +2290,30 @@ class Window(QMainWindow):
 				if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
 					netlink = get_network_link(self.client.network)
 					if netlink!=None:
-						self.status_server.setText("<small><b>"+self.client.hostname+"</b> (<a href=\""+netlink+"\">"+self.client.network+"</a>)</small>")
+						self.status_server.setText(f"<small><b>{self.client.hostname}</b> (<a href=\"{netlink}\">{self.client.network}</a>)</small>")
 					else:
-						self.status_server.setText("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+						self.status_server.setText(f"<small><b>{self.client.hostname}</b> ({self.client.network})</small>")
 				else:
-					self.status_server.setText("<small><b>"+self.client.hostname+"</b> ("+self.client.network+")</small>")
+					self.status_server.setText(f"<small><b>{self.client.hostname}</b> ({self.client.network})</small>")
 			else:
 				self.status_server.setText(f"<small><b>{self.client.hostname}</b></small>")
 
 		if self.window_type==CHANNEL_WINDOW:
 			if self.name in self.client.channelmodes:
 				if len(self.client.channelmodes[self.name])>0:
-					modes = " +"+self.client.channelmodes[self.name]
+					modes = f" +{self.client.channelmodes[self.name]}"
 				else:
 					modes = ''
 			else:
 				modes = ''
 
 			if len(modes)>0:
-				cmd = "<small><b>"+self.name+"</b> "+modes+"</small>"
+				cmd = f"<small><b>{self.name}</b> {modes}</small>"
 			else:
-				cmd = "<small><b>"+self.name+"</b></small>"
+				cmd = f"<small><b>{self.name}</b></small>"
 
 			if not config.SHOW_CHANNEL_MODES:
-				cmd = "<small><b>"+self.name+"</b></small>"
+				cmd = f"<small><b>{self.name}</b></small>"
 
 			self.channel_mode_display.setText(cmd)
 			self.setTopic(self.channel_topic)

@@ -988,6 +988,7 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def changedSettingAdvancedSymbol(self,state):
+		self.changed_advanced_setting = True
 		self.changed_alias_symbol = True
 		self.syntax_did_change = True
 		self.changed.show()
@@ -995,12 +996,14 @@ class Dialog(QDialog):
 		self.boldApply()
 
 	def changedSettingAdvanced(self,state):
+		self.changed_advanced_setting = True
 		self.changed.show()
 		self.restart.show()
 		self.boldApply()
 		self.selector.setFocus()
 
 	def changedSettingAdvancedRerender(self,state):
+		self.changed_advanced_setting = True
 		self.rerender = True
 		self.changed.show()
 		self.restart.show()
@@ -1091,7 +1094,8 @@ class Dialog(QDialog):
 			self.restart.show()
 		else:
 			self.saveButton.setEnabled(True)
-			self.restart.hide()
+			if not self.changed_advanced_setting:
+				self.restart.hide()
 		self.changed.show()
 		self.boldApply()
 		self.selector.setFocus()
@@ -1282,6 +1286,7 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def updateMaxChat(self,state):
+		self.changed_advanced_setting = True
 		self.IRC_MAX_PAYLOAD_LENGTH = self.maxChat.value()
 		self.changed.show()
 		self.boldApply()
@@ -1289,6 +1294,7 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def updateHeartbeat(self,state):
+		self.changed_advanced_setting = True
 		self.heartbeat = self.heartbeatLength.value()
 		self.changed.show()
 		self.boldApply()
@@ -2162,24 +2168,63 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def do_restart(self, link):
+		do_reconnect = False
 		msgBox = QMessageBox()
 		msgBox.setIconPixmap(QPixmap(WARN_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
-		msgBox.setText(f"Save settings and restart {APPLICATION_NAME} now?")
+		msgBox.setText(f"<b>Save settings and restart {APPLICATION_NAME} now?</b>")
+
+		if self.parent.connected_to_something:
+			reconnect = QCheckBox("Reconnect to all servers")
+			msgBox.setCheckBox(reconnect)
+
 		msgBox.setWindowTitle("Restart")
 		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
 		msgBox.addButton("Cancel", QMessageBox.RejectRole)
 		msgBox.setDefaultButton(default_button)
 		rval = msgBox.exec()
+		if self.parent.connected_to_something: do_reconnect = reconnect.isChecked()
 		if rval != QMessageBox.RejectRole:
 			self.save(True)
-			if is_running_from_pyinstaller():
-				subprocess.Popen([sys.executable] + ["-R"])
-				self.parent.close()
-				self.parent.app.exit()
+
+			if do_reconnect:
+
+				listOfConnections = {}
+				for i in irc.CONNECTIONS:
+					add_to_list = True
+					for j in self.parent.hiding:
+						if self.parent.hiding[j] is irc.CONNECTIONS[i]: add_to_list = False
+					for j in self.parent.quitting:
+						if irc.CONNECTIONS[i].client_id == j: add_to_list = False
+					if add_to_list: listOfConnections[i] = irc.CONNECTIONS[i]
+
+				args = []
+				if not is_running_from_pyinstaller(): args.append(sys.argv[0])
+				for i in listOfConnections:
+					entry = listOfConnections[i]
+
+					if entry.kwargs["ssl"]:
+						args.append("-S")
+						args.append(f"{entry.server}:{entry.port}")
+					else:
+						args.append("-C")
+						args.append(f"{entry.server}:{entry.port}")
+
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + args)
+					self.parent.close()
+					self.parent.app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,*args)
+
 			else:
-				os.execl(sys.executable, sys.executable, sys.argv[0], "-R")
-				sys.exit()
+
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + ["-R"])
+					self.parent.close()
+					self.parent.app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
 		return
 
 	def playSound(self):
@@ -2350,6 +2395,7 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def encodeChanged(self, i):
+		self.changed_advanced_setting = True
 		self.DECODING_TYPE = self.decType.itemText(i)
 		self.changed.show()
 		self.restart.show()
@@ -2357,6 +2403,7 @@ class Dialog(QDialog):
 		self.selector.setFocus()
 
 	def fallbackChanged(self, i):
+		self.changed_advanced_setting = True
 		self.FALLBACK_DECODING_TYPE = self.fallType.itemText(i)
 		self.changed.show()
 		self.restart.show()
@@ -2488,6 +2535,7 @@ class Dialog(QDialog):
 		self.DECODING_TYPE = config.DECODING_TYPE
 		self.FALLBACK_DECODING_TYPE = config.FALLBACK_DECODING_TYPE
 		self.MAX_LOG_DISPLAY_SIZE = config.MAX_LOG_DISPLAY_SIZE
+		self.changed_advanced_setting = False
 
 		self.setWindowTitle(f"Settings")
 		self.setWindowIcon(QIcon(SETTINGS_ICON))

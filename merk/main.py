@@ -4694,6 +4694,7 @@ class Merk(QMainWindow):
 		self.buildSettingsMenu()
 
 	def settingsDarkMode(self):
+		do_reconnect = False
 		msgBox = QMessageBox()
 		msgBox.setIconPixmap(QPixmap(WARN_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
@@ -4702,6 +4703,8 @@ class Merk(QMainWindow):
 				msgBox.setText(f"<b>Deactivating dark mode requires a restart!<br>This will disconnect from all servers.</b><br><br>Restart {APPLICATION_NAME} now?")
 			else:
 				msgBox.setText(f"<b>Activating dark mode requires a restart!<br>This will disconnect from all servers.</b><br><br>Restart {APPLICATION_NAME} now?")
+			reconnect = QCheckBox("Reconnect to all servers")
+			msgBox.setCheckBox(reconnect)
 		else:
 			if config.DARK_MODE:
 				msgBox.setText(f"<b>Deactivating dark mode requires a restart!</b><br><br>Restart {APPLICATION_NAME} now?")
@@ -4718,6 +4721,7 @@ class Merk(QMainWindow):
 		default_button.setFont(f)
 
 		rval = msgBox.exec()
+		if self.connected_to_something: do_reconnect = reconnect.isChecked()
 		if rval != QMessageBox.RejectRole:
 			if self.is_hidden: self.toggleHide()
 			if config.DARK_MODE:
@@ -4725,12 +4729,120 @@ class Merk(QMainWindow):
 			else:
 				config.DARK_MODE = True
 			self.save_config()
-			if is_running_from_pyinstaller():
-				subprocess.Popen([sys.executable] + ["-R"])
-				self.close()
-				app.exit()
+
+			if do_reconnect:
+
+				listOfConnections = {}
+				for i in irc.CONNECTIONS:
+					add_to_list = True
+					for j in self.hiding:
+						if self.hiding[j] is irc.CONNECTIONS[i]: add_to_list = False
+					for j in self.quitting:
+						if irc.CONNECTIONS[i].client_id == j: add_to_list = False
+					if add_to_list: listOfConnections[i] = irc.CONNECTIONS[i]
+
+				args = []
+				if not is_running_from_pyinstaller(): args.append(sys.argv[0])
+				for i in listOfConnections:
+					entry = listOfConnections[i]
+
+					if entry.kwargs["ssl"]:
+						args.append("-S")
+						args.append(f"{entry.server}:{entry.port}")
+					else:
+						args.append("-C")
+						args.append(f"{entry.server}:{entry.port}")
+
+				if self.is_hidden: self.toggleHide()
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + args)
+					self.close()
+					app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,*args)
+
 			else:
-				os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
+
+				if self.is_hidden: self.toggleHide()
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + ["-R"])
+					self.close()
+					app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
+
+			# if is_running_from_pyinstaller():
+			# 	subprocess.Popen([sys.executable] + ["-R"])
+			# 	self.close()
+			# 	app.exit()
+			# else:
+			# 	os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
+
+	def settingsRestart(self):
+		do_reconnect = False
+		msgBox = QMessageBox()
+		msgBox.setIconPixmap(QPixmap(WARN_ICON))
+		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
+		if self.connected_to_something:
+			msgBox.setText(f"<b>This will disconnect from all servers.</b><br><br>Restart {APPLICATION_NAME} now?<br>")
+			reconnect = QCheckBox("Reconnect to all servers")
+			msgBox.setCheckBox(reconnect)
+		else:
+			msgBox.setText(f"<b>Restart {APPLICATION_NAME} now?</b><br>")
+		msgBox.setWindowTitle(f"Restart {APPLICATION_NAME}")
+
+		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
+		msgBox.addButton("Cancel", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(default_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
+
+		rval = msgBox.exec()
+		if self.connected_to_something: do_reconnect = reconnect.isChecked()
+		if rval != QMessageBox.RejectRole:
+
+			if do_reconnect:
+
+				listOfConnections = {}
+				for i in irc.CONNECTIONS:
+					add_to_list = True
+					for j in self.hiding:
+						if self.hiding[j] is irc.CONNECTIONS[i]: add_to_list = False
+					for j in self.quitting:
+						if irc.CONNECTIONS[i].client_id == j: add_to_list = False
+					if add_to_list: listOfConnections[i] = irc.CONNECTIONS[i]
+
+				args = []
+				if not is_running_from_pyinstaller(): args.append(sys.argv[0])
+				for i in listOfConnections:
+					entry = listOfConnections[i]
+
+					if entry.kwargs["ssl"]:
+						args.append("-S")
+						args.append(f"{entry.server}:{entry.port}")
+					else:
+						args.append("-C")
+						args.append(f"{entry.server}:{entry.port}")
+
+				if self.is_hidden: self.toggleHide()
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + args)
+					self.close()
+					app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,*args)
+
+			else:
+
+				if self.is_hidden: self.toggleHide()
+				if is_running_from_pyinstaller():
+					subprocess.Popen([sys.executable] + ["-R"])
+					self.close()
+					app.exit()
+				else:
+					os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
 
 	def settingsTimestamps(self):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -5170,6 +5282,15 @@ class Merk(QMainWindow):
 			entry.triggered.connect(lambda state,u=f"{s}": self.menuSetWidget(u))
 			sm.addAction(entry)
 
+		# self.settingsMenu.addSeparator()
+
+		# entry = QAction(QIcon(APPLICATION_ICON),f"Restart {APPLICATION_NAME}", self)
+		# entry.triggered.connect(self.settingsRestart)
+		# f = entry.font()
+		# f.setBold(True)
+		# entry.setFont(f)
+		# self.settingsMenu.addAction(entry)
+
 		self.buildSystrayMenu()
 
 	def openFile(self,filename):
@@ -5188,13 +5309,6 @@ class Merk(QMainWindow):
 			entry = widgets.ExtendedMenuItem(self,SCRIPT_MENU_ICON,'Script Editor','Edit '+APPLICATION_NAME+' scripts&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.newEditorWindow)
 			self.toolsMenu.addAction(entry)
 
-		if(len(os.listdir(logs.LOG_DIRECTORY))==0):
-			entry = widgets.DisabledExtendedMenuItem(self,LOG_MENU_ICON,'Logs','No logs to export&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuExportLog)
-			entry.setEnabled(False)
-		else:
-			entry = widgets.ExtendedMenuItem(self,LOG_MENU_ICON,'Logs','View, manage, or export&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuExportLog)
-		self.toolsMenu.addAction(entry)
-
 		if config.ENABLE_HOTKEYS:
 			entry = widgets.ExtendedMenuItem(self,HOTKEY_MENU_ICON,'Hotkeys','Create, edit, and save&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openHotkeys)
 			self.toolsMenu.addAction(entry)
@@ -5205,6 +5319,10 @@ class Merk(QMainWindow):
 
 		if config.ENABLE_PLUGINS:
 			entry = widgets.ExtendedMenuItem(self,PLUGIN_MENU_ICON,'Plugins','Create, edit, and install&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openPlugin)
+			self.toolsMenu.addAction(entry)
+
+		if(len(os.listdir(logs.LOG_DIRECTORY))!=0):
+			entry = widgets.ExtendedMenuItem(self,LOG_MENU_ICON,'Logs','View, manage, or export&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuExportLog)
 			self.toolsMenu.addAction(entry)
 
 		self.toolsMenu.addSeparator()
@@ -5321,7 +5439,7 @@ class Merk(QMainWindow):
 
 		self.helpMenu.addSeparator()
 
-		entry = QAction(QIcon(LINK_ICON),APPLICATION_NAME+" source code repository",self)
+		entry = QAction(QIcon(LINK_ICON),f"{APPLICATION_NAME} source code repository",self)
 		entry.triggered.connect(lambda state,u=APPLICATION_SOURCE: self.openLinkInBrowser(u))
 		self.helpMenu.addAction(entry)
 
@@ -5329,21 +5447,17 @@ class Merk(QMainWindow):
 		entry.triggered.connect(lambda state,u="https://www.gnu.org/licenses/gpl-3.0.en.html": self.openLinkInBrowser(u))
 		self.helpMenu.addAction(entry)
 
-		entry = QAction(QIcon(LINK_ICON),"Search supported shortcodes",self)
-		entry.triggered.connect(lambda state,u="https://carpedm20.github.io/emoji/all.html?enableList=enable_list_alias": self.openLinkInBrowser(u))
-		self.helpMenu.addAction(entry)
-
 		sm = self.helpMenu.addMenu(QIcon(LINK_ICON),"Technologies")
 
-		entry = QAction(QIcon(PYTHON_ICON),"Python "+platform.python_version().strip(),self)
+		entry = QAction(QIcon(PYTHON_ICON),f"Python {platform.python_version().strip()}",self)
 		entry.triggered.connect(lambda state,u="https://www.python.org/": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(QT_ICON),"Qt "+str(QT_VERSION_STR),self)
+		entry = QAction(QIcon(QT_ICON),f"Qt {QT_VERSION_STR}",self)
 		entry.triggered.connect(lambda state,u="https://www.qt.io/": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(PYQT_ICON),"PyQt "+str(PYQT_VERSION_STR),self)
+		entry = QAction(QIcon(PYQT_ICON),f"PyQt {PYQT_VERSION_STR}",self)
 		entry.triggered.connect(lambda state,u="https://www.riverbankcomputing.com/software/pyqt/": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
@@ -5353,23 +5467,23 @@ class Merk(QMainWindow):
 		tv = tv.strip()
 		tv = tv.split(',')[1].strip()
 		tv = tv.replace('version ','',1)
-		entry = QAction(QIcon(TWISTED_ICON),"Twisted "+tv,self)
+		entry = QAction(QIcon(TWISTED_ICON),f"Twisted {tv}",self)
 		entry.triggered.connect(lambda state,u="https://twisted.org/": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(PYTHON_ICON),"pyspellchecker 0.8.3",self)
+		entry = QAction(QIcon(LINK_ICON),"pyspellchecker 0.8.3",self)
 		entry.triggered.connect(lambda state,u="https://github.com/barrust/pyspellchecker": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(PYTHON_ICON),"emoji 2.15.0",self)
+		entry = QAction(QIcon(LINK_ICON),"emoji 2.15.0",self)
 		entry.triggered.connect(lambda state,u="https://github.com/carpedm20/emoji": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(PYTHON_ICON),"qt5reactor 0.6.3",self)
+		entry = QAction(QIcon(LINK_ICON),"qt5reactor 0.6.3",self)
 		entry.triggered.connect(lambda state,u="https://github.com/twisted/qt5reactor": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
-		entry = QAction(QIcon(PYTHON_ICON),"pike 0.2.0",self)
+		entry = QAction(QIcon(LINK_ICON),"pike 0.2.0",self)
 		entry.triggered.connect(lambda state,u="https://github.com/pyarmory/pike": self.openLinkInBrowser(u))
 		sm.addAction(entry)
 
@@ -5386,7 +5500,7 @@ class Merk(QMainWindow):
 
 			piv = get_pyinstaller_version()
 			if piv:
-				entry = QAction(QIcon(PYINSTALLER_ICON),"PyInstaller "+piv,self)
+				entry = QAction(QIcon(PYINSTALLER_ICON),f"PyInstaller {piv}",self)
 			else:
 				entry = QAction(QIcon(PYINSTALLER_ICON),"PyInstaller",self)
 			entry.triggered.connect(lambda state,u="https://pyinstaller.org/": self.openLinkInBrowser(u))
@@ -5751,13 +5865,16 @@ class Merk(QMainWindow):
 			clean.append(w)
 		windows = clean
 
-		if len(windows)==1:
-			self.mainMenu.addSeparator()
-
 		if len(windows)>0:
 			if len(windows)==1:
+
+				self.mainMenu.addSeparator()
+
 				c = windows[0].widget()
-				sname = c.client.server+":"+str(c.client.port)
+				if c.client.hostname:
+					sname = f"{c.client.hostname}"
+				else:
+					sname = f"{c.client.server}:{c.client.port}"
 				title = 'Disconnect from ' + sname
 				entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),title,self)
 				entry.triggered.connect(self.disconnectAll)
@@ -5772,15 +5889,21 @@ class Merk(QMainWindow):
 			if len(windows)>1:
 				for w in windows:
 					c = w.widget()
-					sname = c.client.server+":"+str(c.client.port)
+					if c.client.hostname:
+						sname = f"{c.client.hostname}"
+					else:
+						sname = f"{c.client.server}:{c.client.port}"
 					entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),"Disconnect from "+sname,self)
 					entry.triggered.connect(lambda state,u=c: u.disconnect())
 					self.mainMenu.addAction(entry)
 
 		self.mainMenu.addSeparator()
 
-		entry = QAction(QIcon(QUIT_ICON),"Quit",self)
+		entry = QAction(QIcon(QUIT_ICON),f"Exit {APPLICATION_NAME}",self)
 		entry.triggered.connect(self.close)
+		f = entry.font()
+		f.setBold(True)
+		entry.setFont(f)
 		self.mainMenu.addAction(entry)
 
 	def menuDocked(self,is_floating):

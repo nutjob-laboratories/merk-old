@@ -418,9 +418,10 @@ class wMenuButton(QPushButton):
 				cscript = commands.find_script(self.window.encodeScriptFilename(),None)
 				if cscript!=None:
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
+					entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.openEditor(h))
 				else:
 					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
-				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
+					entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
 				menu.addAction(entry)
 
 			if self.subwindow.isVisible():
@@ -669,9 +670,10 @@ class wIconMenuButton(QPushButton):
 				cscript = commands.find_script(self.window.encodeScriptFilename(),None)
 				if cscript!=None:
 					entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
+					entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.openEditor(h))
 				else:
 					entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
-				entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
+					entry.triggered.connect(lambda state,h=self.window.encodeScriptFilename(): self.window.parent.newEditorWindowSave(h))
 				menu.addAction(entry)
 
 			if self.subwindow.isVisible():

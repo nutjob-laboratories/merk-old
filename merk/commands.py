@@ -6077,30 +6077,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 		# /window restart
 		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'window' and len(tokens)==2:
 			if tokens[1].lower()=='restart':
-
-				msg = f"Restart {APPLICATION_NAME}?\n\n{APPLICATION_NAME} will disconnect from any connected servers, and\nrestart without any command-line arguments."
-
-				msgBox = QMessageBox()
-				msgBox.setIconPixmap(QPixmap(QUIT_ICON))
-				msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
-				msgBox.setText(msg)
-				msgBox.setWindowTitle(f"{config.ISSUE_COMMAND_SYMBOL}window restart")
-
-				default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
-				msgBox.addButton("Cancel", QMessageBox.RejectRole)
-				msgBox.setDefaultButton(default_button)
-
-				rval = msgBox.exec()
-				if rval == QMessageBox.RejectRole:
-					pass
-				else:
-					if is_running_from_pyinstaller():
-						subprocess.Popen([sys.executable] + ["-R"])
-						gui.close()
-						gui.app.exit()
-					else:
-						os.execl(sys.executable, sys.executable, sys.argv[0], "-R")
-						sys.exit()
+				gui.settingsRestart()
 				return True
 
 		# /window minimize

@@ -1,4 +1,40 @@
 |------------------------------------------------------------------------------|
+|                                   0.052.250                                  |
+|------------------------------------------------------------------------------|
+
+|==============================================================================|
+|                              APPLICATION CHANGES                             |
+|==============================================================================|
+
+* Bugfix: changed the "create channel script" and "edit channel script" options
+  in the windowbar right click menu for channel windows to make a little more
+  sense.
+* Tweaked the right click menu for the server window chat display to show the
+  reported hostname for the server for disconnection, rather than just the 
+  connecting server's IP/host and port.
+* A server's reported hostname is now used in the "IRC" menu for disconnection.
+* The "Quit" entry in the "IRC" menu is now showed in bold, to match changes
+  in a lot of right click menus to show a "this will do something immediately"
+  vibe for the entry.
+* Tweaked the "Tools" menu. Now, if there are no logs to view, the "Logs" entry
+  will no longer be visible in the menu. Also, the "Logs" entry has been moved
+  to the bottom of the menu.
+* Tweaked the "Help" menu, and removed some duplicated entries.
+* Moved the functionality for the "/window restart" command to the main
+  application window.
+* Added an option to the "/window restart" command to reconnect to all currently
+  connected servers on restart.
+* Added the "reconnect to all servers" option to the "dark mode" restart option
+  triggered from the "Settings" menu.
+* Added the "reconnect to all servers" option to the "apply & restart" option
+  in the "Settings" dialog.
+* Bugfix: the "apply & restart" button could be hidden in some circumstances
+  in the "Settings" dialog, even if it was needed.
+* Channel and private chat status bars now identify exactly what the window is
+  for (channels state the name, and private chats identify the user), as well
+  as how MERK is connected to the server (SSL or TCP/IP).
+
+|------------------------------------------------------------------------------|
 |                                   0.052.200                                  |
 |------------------------------------------------------------------------------|
 
