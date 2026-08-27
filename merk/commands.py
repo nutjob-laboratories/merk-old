@@ -9082,11 +9082,10 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 				msg = interpolateAliases(msg)
 
 			if len(msg)>0:
-				window.client.quit(msg)
+				window.disconnect(msg)
 			else:
 				window.client.quit()
-
-			gui.quitting[window.client.client_id] = 0
+				gui.quitting[window.client.client_id] = 0
 			return True
 		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'quit' and len(tokens)>=2:
 
@@ -9098,8 +9097,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 			if config.ENABLE_IRC_COLOR_MARKUP: msg = inject_irc_colors(msg)
 			if config.ENABLE_EMOJI_SHORTCODES: msg = emojize(msg,config.EMOJI_LANGUAGE)
 			if config.ENABLE_ASCIIMOJI_SHORTCODES: msg = asciimojize(msg)
-			window.client.quit(msg)
-			gui.quitting[window.client.client_id] = 0
+			window.disconnect(msg)
 			return True
 
 	# |-------|

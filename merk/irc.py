@@ -590,18 +590,17 @@ class IRC_Connection(irc.IRCClient):
 
 			# Request various IRCv3 extensions
 			if w:
-				t = Message(SYSTEM_MESSAGE,'',"Requesting IRCv3 extensions...")
+				t = Message(SYSTEM_MESSAGE,'',"Requesting IRCv3 capabilities...")
 				w.writeText(t)
 			self.sendLine("CAP REQ :cap-notify")
 			self.sendLine("CAP REQ :userhost-in-names")
 			self.sendLine("CAP REQ :multi-prefix")
 			self.sendLine("CAP REQ :away-notify")
 
-			# Now, load in extensions requested from
-			# plugins
+			# Now, load in extensions requested from plugins
 			if len(plugins.CAPABILITIES)>0:
 				if w:
-					t = Message(SYSTEM_MESSAGE,'',"Requesting IRCv3 extensions for plugins...")
+					t = Message(SYSTEM_MESSAGE,'',"Requesting IRCv3 capabilities for plugins...")
 					w.writeText(t)
 				for c in plugins.CAPABILITIES:
 					self.sendLine(f"CAP REQ :{c}")
@@ -610,18 +609,12 @@ class IRC_Connection(irc.IRCClient):
 			# login information, request authentication
 			if self.sasl_username!=None and self.sasl_password!=None:
 				self.sendLine("CAP REQ :sasl")
-				if w:
-					t = Message(SYSTEM_MESSAGE,'','Requesting SASL login...')
-					w.writeText(t)
 			else:
 				self.sendLine("CAP END")
 
 		elif subcommand == "ACK" and "sasl" in capabilities:
 			# Start SASL login process
 			self.sendLine("AUTHENTICATE PLAIN")
-			if w:
-				t = Message(SYSTEM_MESSAGE,'','Negotiating SASL login...')
-				w.writeText(t)
 
 		elif subcommand == "ACK" and "userhost-in-names" in capabilities:
 			# If hostmasks are sent with names, then we
@@ -630,16 +623,16 @@ class IRC_Connection(irc.IRCClient):
 			self.support_hostmasks_in_names = True
 
 		elif subcommand == "ACK":
-
-			for c in plugins.CAPABILITIES:
-				if c in capabilities:
-					plugins.call(self.gui,"ack",client=self,extension=f"{c}")
+			if len(plugins.CAPABILITIES)>0:
+				for c in plugins.CAPABILITIES:
+					if c in capabilities:
+						plugins.call(self.gui,"ack",client=self,extension=f"{c}")
 
 		elif subcommand == "NAK":
-
-			for c in plugins.CAPABILITIES:
-				if c in capabilities:
-					plugins.call(self.gui,"nak",client=self,extension=f"{c}")
+			if len(plugins.CAPABILITIES)>0:
+				for c in plugins.CAPABILITIES:
+					if c in capabilities:
+						plugins.call(self.gui,"nak",client=self,extension=f"{c}")
 
 			# Server doesn't support things that we are looking
 			# for, so tell the server we're done with negotiation
@@ -650,10 +643,6 @@ class IRC_Connection(irc.IRCClient):
 		if params[0] == "+":
 			payload = f"\0{self.sasl_username}\0{self.sasl_password}"
 			encoded = base64.b64encode(payload.encode("utf-8")).decode("utf-8")
-			w = self.gui.getServerWindow(self)
-			if w:
-				t = Message(SYSTEM_MESSAGE,'','Sending username and password...')
-				w.writeText(t)
 			self.sendLine(f"AUTHENTICATE {encoded}")
 			
 	def irc_903(self, prefix, params):
@@ -778,7 +767,14 @@ class IRC_Connection(irc.IRCClient):
 
 		w = self.gui.getServerWindow(self)
 		if w:
-			t = Message(SYSTEM_MESSAGE,'','Server registration complete!')
+			if self.hostname:
+				if self.hostname.lower()!=f"{self.server}".lower():
+					sid = f"Connected to {self.hostname} ({self.server}:{self.port})!"
+				else:
+					sid = f"Connected to {self.hostname}!"
+			else:
+				sid = f"Connected to {self.server}:{self.port}!"
+			t = Message(SYSTEM_MESSAGE,'',f'{sid}')
 			w.writeText(t)
 
 	def joined(self, channel):
@@ -1217,6 +1213,7 @@ class IRC_Connection(irc.IRCClient):
 		self.gui.gotServerVersion(self,server,sversion)
 
 	def irc_QUIT(self,prefix,params):
+
 		x = prefix.split('!')
 		if len(x) >= 2:
 			nick = x[0]

@@ -1309,7 +1309,7 @@ class Merk(QMainWindow):
 	def connectionMade(self,client):
 		w = self.newServerWindow(client.server+":"+str(client.port),client)
 		c = w.widget()
-		t = Message(SYSTEM_MESSAGE,'',"Connected to "+client.server+":"+str(client.port)+"!")
+		t = Message(SYSTEM_MESSAGE,'',f"Connecting to {client.server}:{client.port}...")
 		c.writeText(t)
 
 		client.reset_environment()
@@ -1331,7 +1331,7 @@ class Merk(QMainWindow):
 		else:
 			self.log_dump[f"{client.client_id}"] = "Server log not found"
 
-		plugins.call(self,"lost",client=client)
+		# Close all subwindows associated with the client
 		windows = self.getAllSubWindows(client)
 		for w in windows:
 			if hasattr(w,"widget"):
@@ -1339,9 +1339,12 @@ class Merk(QMainWindow):
 					w.widget().force_close = True
 			w.close()
 
+		plugins.call(self,"lost",client=client)
+
+		# Build the "Windows" menu
 		self.buildWindowsMenu()
 
-		# If the flash doesn't work, just ignore the error
+		# Trigger notifications
 		try:
 			if config.FLASH_SYSTRAY_DISCONNECT: self.show_notifications("Connection to "+client.hostname+" lost")
 		except:
@@ -1397,7 +1400,7 @@ class Merk(QMainWindow):
 							t = Message(ERROR_MESSAGE,'',f"Error reading {os.path.basename(f)}: {e}")
 							w.writeText(t)
 		
-		self.nickChanged(client)
+		self.nickChanged(client,True)
 
 		if config.SCRIPTING_ENGINE_ENABLED:
 			if client.kwargs["execute_script"]==True:
@@ -1946,8 +1949,9 @@ class Merk(QMainWindow):
 				if hasattr(c,"toggleServNicks"):
 					c.toggleServNicks()
 
-	def nickChanged(self,client):
-		plugins.call(self,"nick",client=client,nickname=client.nickname)
+	def nickChanged(self,client,initial=False):
+		if initial==False:
+			plugins.call(self,"nick",client=client,nickname=client.nickname)
 
 		write_to_server_window = True
 		wid = None
@@ -1961,33 +1965,35 @@ class Merk(QMainWindow):
 				if c.window_type==CHANNEL_WINDOW:
 					c.client.sendLine("NAMES "+c.name)
 
-			if self.current_window!=None:
-				if hasattr(c,"client") and hasattr(self.current_window,"client"):
-					if self.current_window.client == client:
-						if hasattr(self.current_window,"window_type"):
-							if self.current_window.window_type==SERVER_WINDOW or self.current_window.window_type==CHANNEL_WINDOW or self.current_window.window_type==PRIVATE_WINDOW:
-								if not already_wrote:
-									t = Message(SYSTEM_MESSAGE,"","You are now known as \""+client.nickname+"\"")
-									self.current_window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
-									wid = self.current_window.subwindow_id
-									already_wrote = True
+			if initial==False:
+				if self.current_window!=None:
+					if hasattr(c,"client") and hasattr(self.current_window,"client"):
+						if self.current_window.client == client:
+							if hasattr(self.current_window,"window_type"):
+								if self.current_window.window_type==SERVER_WINDOW or self.current_window.window_type==CHANNEL_WINDOW or self.current_window.window_type==PRIVATE_WINDOW:
+									if not already_wrote:
+										t = Message(SYSTEM_MESSAGE,"",f"You are now known as \"{client.nickname}\"")
+										self.current_window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+										wid = self.current_window.subwindow_id
+										already_wrote = True
 
 		# Write a notification to the server window,
 		# but *only* if the current window is *not*
 		# the server window
-		w = self.getServerWindow(client)
-		if wid:
-			if w:
-				if wid==w.subwindow_id: write_to_server_window = False
+		if initial==False:
+			w = self.getServerWindow(client)
+			if wid:
+				if w:
+					if wid==w.subwindow_id: write_to_server_window = False
 
-		if write_to_server_window:
-			if w:
-				t = Message(SYSTEM_MESSAGE,"","You are now known as \""+client.nickname+"\"")
-				w.writeText(t)
+			if write_to_server_window:
+				if w:
+					t = Message(SYSTEM_MESSAGE,"",f"You are now known as \"{client.nickname}\"")
+					w.writeText(t)
 
-		# Rerender chats for nick highlight
-		if config.HIGHLIGHT_NICKS_IN_CHAT:
-			self.reRenderClient(client,True)
+			# Rerender chats for nick highlight
+			if config.HIGHLIGHT_NICKS_IN_CHAT:
+				self.reRenderClient(client,True)
 
 	def topicChanged(self,client,user,channel,newTopic):
 		x = user.split('!')

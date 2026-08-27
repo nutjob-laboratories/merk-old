@@ -3756,6 +3756,10 @@ class Dialog(QDialog):
 		sizeButton.setIcon(QIcon(EDIT_ICON))
 		sizeButton.setToolTip("Change default subwindow size")
 
+		self.statusInfo = QCheckBox("Show window information in status bar",self)
+		if config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR: self.statusInfo.setChecked(True)
+		self.statusInfo.stateChanged.connect(self.changedSettingStatusBar)
+
 		sizeLayout = QHBoxLayout()
 		sizeLayout.addWidget(sizeButton)
 		sizeLayout.addWidget(self.sizeLabel)
@@ -3769,6 +3773,7 @@ class Dialog(QDialog):
 		swsSettings.addLayout(distanceLayout)
 		swsSettings.addWidget(self.showInfo)
 		swsSettings.addWidget(self.enableNickClick)
+		swsSettings.addWidget(self.statusInfo)
 		swsSettings.addLayout(rbLayout)
 
 		ssLayout = QVBoxLayout()
@@ -7866,6 +7871,7 @@ class Dialog(QDialog):
 		config.SHOW_JOIN_IN_WINDOWS_MENU = self.showWinJoin.isChecked()
 		config.WINDOWS_MENU_WINDOW_SHORTCUTS = self.showWinShortcuts.isChecked()
 		config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS = self.showWinManShort.isChecked()
+		config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = self.statusInfo.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True

@@ -33,6 +33,13 @@
 * Channel and private chat status bars now identify exactly what the window is
   for (channels state the name, and private chats identify the user), as well
   as how MERK is connected to the server (SSL or TCP/IP).
+* Added an option to toggle the window information display on channel and
+  private chat status bars. The option has been added to the "Subwindows"
+  section in the "Settings" dialog.
+* Tweaked the right click menu for channel chat displays.
+* Reduced the amount of "spam" displayed in server windows during registration.
+* Bugfix: when using the "/quit" command, quit messages weren't always being
+  sent to the server.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |
