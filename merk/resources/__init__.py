@@ -902,7 +902,7 @@ def has_url(text):
 
 def is_url(text):
 	url_pattern = re.compile(
-		r'^(https?|ftp):\/\/'             # Scheme
+		r'(https?):\/\/'            	  # Scheme
 		r'(\S+(:\S*)?@)?'                 # Authentication (optional)
 		r'('
 		r'([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}' # Domain name

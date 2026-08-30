@@ -195,8 +195,16 @@ class Window(QMainWindow):
 		msgBox.setWindowTitle("Back up log for "+item.channel+" ("+item.network+")")
 
 		default_button = msgBox.addButton(" Back up log ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
+		msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 		msgBox.setDefaultButton(default_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
 
 		rval = msgBox.exec()
 		if rval != QMessageBox.RejectRole:
@@ -226,8 +234,12 @@ class Window(QMainWindow):
 		msgBox.setWindowTitle("Delete log for "+item.channel+" ("+item.network+")")
 
 		default_button = msgBox.addButton(" Delete log ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
-		msgBox.setDefaultButton(default_button)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
 
 		rval = msgBox.exec()
 		if rval != QMessageBox.RejectRole:

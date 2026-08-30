@@ -418,6 +418,10 @@ if __name__ == '__main__':
 		msgBox.setDefaultButton(default_button)
 		msgBox.setInformativeText("".join(cl))
 
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
+
 		label = msgBox.findChild(QLabel)
 		if label:
 			label.setWordWrap(True)

@@ -1291,8 +1291,12 @@ class Window(QMainWindow):
 		msgBox.setWindowTitle("Unban All")
 		
 		default_button = msgBox.addButton(" Unban all users ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
-		msgBox.setDefaultButton(default_button)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
 
 		rval = msgBox.exec()
 		if rval == QMessageBox.RejectRole:
@@ -3869,47 +3873,7 @@ class Window(QMainWindow):
 
 	def menuSetLanguage(self,language):
 		self.changeSpellcheckLanguage(language)
-
-		if not hasattr(self,"languageEnglish"): self.buildInputOptionsMenu()
-
-		self.languageEnglish.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageFrench.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageSpanish.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageGerman.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageDutch.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageItalian.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languageRussian.setIcon(QIcon(self.parent.round_unchecked_icon))
-		self.languagePortuguese.setIcon(QIcon(self.parent.round_unchecked_icon))
-
-		if self.language=="en": self.languageEnglish.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="fr": self.languageFrench.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="es": self.languageSpanish.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="de": self.languageGerman.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="nl": self.languageDutch.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="it": self.languageItalian.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="ru": self.languageRussian.setIcon(QIcon(self.parent.round_checked_icon))
-		if self.language=="pt": self.languagePortuguese.setIcon(QIcon(self.parent.round_checked_icon))
-
-		if config.ENABLE_SPELLCHECK:
-			self.languageEnglish.setEnabled(True)
-			self.languageFrench.setEnabled(True)
-			self.languageSpanish.setEnabled(True)
-			self.languageGerman.setEnabled(True)
-			self.languageDutch.setEnabled(True)
-			self.languageItalian.setEnabled(True)
-			self.languageRussian.setEnabled(True)
-			self.languagePortuguese.setEnabled(True)
-		else:
-			self.languageEnglish.setEnabled(False)
-			self.languageFrench.setEnabled(False)
-			self.languageSpanish.setEnabled(False)
-			self.languageGerman.setEnabled(False)
-			self.languageDutch.setEnabled(False)
-			self.languageItalian.setEnabled(False)
-			self.languageRussian.setEnabled(False)
-			self.languagePortuguese.setEnabled(False)
-
-		self.parent.rebuildAllInputMenus()
+		self.buildInputOptionsMenu()
 		self.input.setFocus()
 
 	def linkClicked(self,url):
@@ -3930,36 +3894,28 @@ class Window(QMainWindow):
 			
 			chan = url.toString()
 
-			# If it's a user in the link...
-			if chan[:1]!='#' and chan[:1]!='&' and chan[:1]!='!' and chan[:1]!='+':
-				# Find the private chat window if it
-				# exists, and move focus to it
-				w = self.parent.getSubWindow(chan,self.client)
-				if w:
+			# Channel links
+			if chan[:1]=='#' or chan[:1]=='&' or chan[:1]=='!' or chan[:1]=='+':
+				found = False
+				for w in self.parent.getAllSubChannelWindows(self.client):
+					if w.widget().name==chan:
+						found = True
+						if not w.isVisible(): w.show()
+						w.widget().input.setFocus()
+
+				if not found: self.client.join(chan)
+			else:
+				found = False
+				for w in self.parent.getAllPrivateWindows(self.client):
+					if w.widget().name==chan:
+						found = True
+						if not w.isVisible(): w.show()
+						w.widget().input.setFocus()
+
+				if not found:
+					w = self.parent.newPrivateWindow(chan,self.client)
 					self.parent.showSubWindow(w)
-					self.chat.setSource(QUrl())
-					sb.setValue(og_value)
-					return
 
-				# Create a new private chat window
-				w = self.parent.newPrivateWindow(chan,self.client)
-				self.parent.showSubWindow(w)
-				self.chat.setSource(QUrl())
-				sb.setValue(og_value)
-				return
-
-			# It's not a user, so it's a channel, so let's
-			# try to find that channel window if it's open
-			found = False
-			for w in self.parent.getAllSubChannelWindows(self.client):
-				if w.widget().name==chan:
-					found = True
-					if not w.isVisible(): w.show()
-					w.widget().input.setFocus()
-
-			# We didn't find an open channel window, so
-			# let's join the channel
-			if not found: self.client.join(chan)
 
 			self.chat.setSource(QUrl())
 			sb.setValue(og_value)

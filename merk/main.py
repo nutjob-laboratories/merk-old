@@ -4702,7 +4702,7 @@ class Merk(QMainWindow):
 	def settingsDarkMode(self):
 		do_reconnect = False
 		msgBox = QMessageBox()
-		msgBox.setIconPixmap(QPixmap(WARN_ICON))
+		msgBox.setIconPixmap(QPixmap(APPLICATION_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
 		if self.connected_to_something:
 			if config.DARK_MODE:
@@ -4719,8 +4719,8 @@ class Merk(QMainWindow):
 		msgBox.setWindowTitle("Restart")
 
 		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
-		msgBox.setDefaultButton(default_button)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
 
 		f = default_button.font()
 		f.setBold(True)
@@ -4766,9 +4766,7 @@ class Merk(QMainWindow):
 					app.exit()
 				else:
 					os.execl(sys.executable, sys.executable,*args)
-
 			else:
-
 				if self.is_hidden: self.toggleHide()
 				if is_running_from_pyinstaller():
 					subprocess.Popen([sys.executable] + ["-R"])
@@ -4776,13 +4774,6 @@ class Merk(QMainWindow):
 					app.exit()
 				else:
 					os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
-
-			# if is_running_from_pyinstaller():
-			# 	subprocess.Popen([sys.executable] + ["-R"])
-			# 	self.close()
-			# 	app.exit()
-			# else:
-			# 	os.execl(sys.executable, sys.executable,sys.argv[0],"-R")
 
 	def settingsRestart(self):
 		do_reconnect = False
@@ -4798,8 +4789,8 @@ class Merk(QMainWindow):
 		msgBox.setWindowTitle(f"Restart {APPLICATION_NAME}")
 
 		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
-		msgBox.setDefaultButton(default_button)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
 
 		f = default_button.font()
 		f.setBold(True)
@@ -4839,9 +4830,7 @@ class Merk(QMainWindow):
 					app.exit()
 				else:
 					os.execl(sys.executable, sys.executable,*args)
-
 			else:
-
 				if self.is_hidden: self.toggleHide()
 				if is_running_from_pyinstaller():
 					subprocess.Popen([sys.executable] + ["-R"])
@@ -6092,7 +6081,7 @@ class Merk(QMainWindow):
 			msgBox.setWindowTitle("Disconnect")
 
 			default_button = msgBox.addButton(" Disconnect from server ", QMessageBox.AcceptRole)
-			msgBox.addButton("Cancel", QMessageBox.RejectRole)
+			msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 			msgBox.setDefaultButton(default_button)
 
 			label = msgBox.findChild(QLabel)
@@ -6149,7 +6138,7 @@ class Merk(QMainWindow):
 				default_button = msgBox.addButton(" Disconnect from servers ", QMessageBox.AcceptRole)
 			else:
 				default_button = msgBox.addButton(" Disconnect from server ", QMessageBox.AcceptRole)
-			msgBox.addButton("Cancel", QMessageBox.RejectRole)
+			msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 			msgBox.setDefaultButton(default_button)
 
 			label = msgBox.findChild(QLabel)
@@ -6312,7 +6301,7 @@ class Merk(QMainWindow):
 			msgBox.setText("Are you sure you want to exit?")
 			msgBox.setWindowTitle("Exit")
 			default_button = msgBox.addButton(f" Exit {APPLICATION_NAME} ", QMessageBox.AcceptRole)
-			msgBox.addButton("Cancel", QMessageBox.RejectRole)
+			msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 			msgBox.setDefaultButton(default_button)
 
 			rval = msgBox.exec()
@@ -6897,8 +6886,8 @@ class MdiArea(QMdiArea):
 					msgBox.setWindowTitle("Overwrite")
 
 					default_button = msgBox.addButton(" Overwrite files ", QMessageBox.AcceptRole)
-					msgBox.addButton("Cancel", QMessageBox.RejectRole)
-					msgBox.setDefaultButton(default_button)
+					cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+					msgBox.setDefaultButton(cancel_button)
 
 					rval = msgBox.exec()
 					if rval == QMessageBox.RejectRole:

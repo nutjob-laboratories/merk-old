@@ -40,6 +40,11 @@
 * Reduced the amount of "spam" displayed in server windows during registration.
 * Bugfix: when using the "/quit" command, quit messages weren't always being
   sent to the server.
+* Bugfix: the URL "detector" function would recognize FTP as a valid schema.
+* If a dialog is going to make a permanent change (delete or overwrite a file,
+  etc), the application will now set the default button to "cancel".
+* Resized the application icon in the resource file to match the size of all
+  other icons (48x48).
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

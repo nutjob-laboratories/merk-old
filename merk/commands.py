@@ -112,8 +112,12 @@ def ShowHaltDialog(msg=None):
 	msgBox.setWindowTitle("Halt")
 
 	default_button = msgBox.addButton(" Halt script ", QMessageBox.AcceptRole)
-	msgBox.addButton("Cancel", QMessageBox.RejectRole)
+	msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 	msgBox.setDefaultButton(default_button)
+
+	f = default_button.font()
+	f.setBold(True)
+	default_button.setFont(f)
 
 	rval = msgBox.exec()
 	if rval == QMessageBox.RejectRole:

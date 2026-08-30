@@ -1929,9 +1929,14 @@ class IRC_Connection_Factory(protocol.ClientFactory):
 			label = msgBox.findChild(QLabel)
 			if label:
 				label.setWordWrap(True)
-			default_button = msgBox.addButton("Ok", QMessageBox.AcceptRole)
+			default_button = msgBox.addButton(" Ok ", QMessageBox.AcceptRole)
 			msgBox.addButton(" View server log ", QMessageBox.RejectRole)
 			msgBox.setDefaultButton(default_button)
+
+			f = default_button.font()
+			f.setBold(True)
+			default_button.setFont(f)
+			
 			rval = msgBox.exec()
 			if rval == QMessageBox.RejectRole:
 				self.kwargs["gui"].newLogdumpWindow(html_log_dump,f"{self.kwargs["server"]}:{self.kwargs["port"]}")
@@ -2008,18 +2013,20 @@ class IRC_ReConnection_Factory(protocol.ReconnectingClientFactory):
 				msg = f"""
 				There seems to be difficulty connecting to <b>{self.kwargs['server']}:{self.kwargs['port']}</b>.
 				This may be caused by your Internet connection or your settings. You may wish to check your
-				settings before attempting to reconnect.<br><br>
-
-				Click <b>Ok</b> to continue trying to reconnect
-				with your current settings, or <b>Cancel</b> to abort."""
+				settings before attempting to reconnect."""
 				msgBox = QMessageBox()
 				msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
 				msgBox.setText(msg)
 				msgBox.setInformativeText(f"<i>{reason.getErrorMessage()}</i>")
 				msgBox.setWindowTitle("Connection lost")
-				default_button = msgBox.addButton("Ok", QMessageBox.AcceptRole)
-				msgBox.addButton("Cancel", QMessageBox.RejectRole)
-				msgBox.setDefaultButton(default_button)
+				default_button = msgBox.addButton(" Keep trying to reconnect ", QMessageBox.AcceptRole)
+				cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+				msgBox.setDefaultButton(cancel_button)
+
+				f = default_button.font()
+				f.setBold(True)
+				default_button.setFont(f)
+
 				label = msgBox.findChild(QLabel)
 				if label:
 					label.setWordWrap(True)
@@ -2048,11 +2055,16 @@ class IRC_ReConnection_Factory(protocol.ReconnectingClientFactory):
 			msgBox.setText(msg)
 			msgBox.setInformativeText(f"<i>{reason.getErrorMessage()}</i>")
 			msgBox.setWindowTitle("Connection lost")
-			default_button = msgBox.addButton("Ok", QMessageBox.AcceptRole)
-			msgBox.addButton("Cancel", QMessageBox.RejectRole)
+			default_button = msgBox.addButton(" Reconnect ", QMessageBox.AcceptRole)
+			msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 			dump_button = msgBox.addButton(" View server log ", QMessageBox.ActionRole)
 			dump_button.clicked.connect(lambda a,u=html_log_dump,t=f"{self.kwargs["server"]}:{self.kwargs["port"]}": self.kwargs["gui"].newLogdumpWindow(u,t))
 			msgBox.setDefaultButton(default_button)
+
+			f = default_button.font()
+			f.setBold(True)
+			default_button.setFont(f)
+
 			label = msgBox.findChild(QLabel)
 			if label:
 				label.setWordWrap(True)

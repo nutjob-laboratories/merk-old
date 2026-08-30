@@ -66,8 +66,12 @@ class Window(QMainWindow):
 				msgBox.setWindowTitle("Add icon")
 
 				default_button = msgBox.addButton(f" Add icon to plugin ", QMessageBox.AcceptRole)
-				msgBox.addButton("Cancel", QMessageBox.RejectRole)
-				msgBox.setDefaultButton(default_button)
+				cancel_button = msgBox.addButton(" No icon ", QMessageBox.RejectRole)
+				msgBox.setDefaultButton(cancel_button)
+
+				f = default_button.font()
+				f.setBold(True)
+				default_button.setFont(f)
 
 				rval = msgBox.exec()
 				if rval == QMessageBox.RejectRole:
@@ -169,8 +173,12 @@ class Window(QMainWindow):
 			msgBox.setWindowTitle("Overwrite")
 
 			default_button = msgBox.addButton(f" Overwrite ", QMessageBox.AcceptRole)
-			msgBox.addButton("Cancel", QMessageBox.RejectRole)
-			msgBox.setDefaultButton(default_button)
+			cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+			msgBox.setDefaultButton(cancel_button)
+
+			f = default_button.font()
+			f.setBold(True)
+			default_button.setFont(f)
 
 			rval = msgBox.exec()
 			if rval == QMessageBox.RejectRole:
@@ -255,8 +263,12 @@ class Window(QMainWindow):
 		msgBox.setWindowTitle("Delete plugin")
 
 		default_button = msgBox.addButton(f" Delete {pid} ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
-		msgBox.setDefaultButton(default_button)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
 
 		rval = msgBox.exec()
 		if rval == QMessageBox.RejectRole:
@@ -539,7 +551,7 @@ class Window(QMainWindow):
 							menu.addAction(edit_action)
 
 						if config.ENABLE_PLUGIN_EDITOR:
-							edit_action = QAction(QIcon(SCRIPT_ICON),"Edit plugin", self)
+							edit_action = QAction(QIcon(PYTHON_ICON),"Edit plugin", self)
 							edit_action.triggered.connect(lambda: self.parent.openPythonEditor(item.filename))
 						else:
 							edit_action = QAction(QIcon(EXE_ICON),"Edit plugin", self)

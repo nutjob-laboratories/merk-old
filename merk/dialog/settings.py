@@ -2180,8 +2180,13 @@ class Dialog(QDialog):
 
 		msgBox.setWindowTitle("Restart")
 		default_button = msgBox.addButton(f" Restart {APPLICATION_NAME} ", QMessageBox.AcceptRole)
-		msgBox.addButton("Cancel", QMessageBox.RejectRole)
+		msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 		msgBox.setDefaultButton(default_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
+		
 		rval = msgBox.exec()
 		if self.parent.connected_to_something: do_reconnect = reconnect.isChecked()
 		if rval != QMessageBox.RejectRole:
@@ -8230,8 +8235,12 @@ class Dialog(QDialog):
 					msgBox.setWindowTitle("Disconnect")
 
 					default_button = msgBox.addButton(f" Disconnect from all servers ", QMessageBox.AcceptRole)
-					msgBox.addButton("Cancel", QMessageBox.RejectRole)
+					msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
 					msgBox.setDefaultButton(default_button)
+
+					f = default_button.font()
+					f.setBold(True)
+					default_button.setFont(f)
 
 					rval = msgBox.exec()
 					if rval == QMessageBox.RejectRole:

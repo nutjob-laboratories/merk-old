@@ -650,8 +650,12 @@ class Window(QMainWindow):
 				msgBox.setWindowTitle("Overwrite File")
 				
 				default_button = msgBox.addButton(" Overwrite script ", QMessageBox.AcceptRole)
-				msgBox.addButton("Cancel", QMessageBox.RejectRole)
-				msgBox.setDefaultButton(default_button)
+				cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+				msgBox.setDefaultButton(cancel_button)
+
+				f = default_button.font()
+				f.setBold(True)
+				default_button.setFont(f)
 
 				rval = msgBox.exec()
 				if rval == QMessageBox.RejectRole:
