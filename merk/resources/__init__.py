@@ -1463,3 +1463,9 @@ class SmallButton(QPushButton):
 		size = super().sizeHint()
 		size.setHeight(size.height() - 5)
 		return size
+
+class StylerButton(QPushButton):
+	def sizeHint(self):
+		size = super().sizeHint()
+		size.setHeight(size.height() - 2)
+		return size

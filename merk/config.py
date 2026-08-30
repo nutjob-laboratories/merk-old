@@ -487,9 +487,13 @@ SHOW_JOIN_IN_WINDOWS_MENU = True
 WINDOWS_MENU_WINDOW_SHORTCUTS = True
 WINDOWS_MENU_MANAGEMENT_SHORTCUTS = True
 DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = True
+MINIMUM_FONT_SIZE = 8
+SHOW_STATUS_IN_USERLIST_MENU = False
 
 def build_settings():
 	settings = {
+		"show_status_in_userlist_menus": SHOW_STATUS_IN_USERLIST_MENU,
+		"minimum_application_font_point_size": MINIMUM_FONT_SIZE,
 		"show_window_information_in_status_bar": DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR,
 		"subwindow_management_shortcuts_in_windows_menu": WINDOWS_MENU_MANAGEMENT_SHORTCUTS,
 		"subwindow_shortcuts_in_windows_menu": WINDOWS_MENU_WINDOW_SHORTCUTS,
@@ -936,6 +940,10 @@ def build_settings():
 	return settings
 
 def patch_settings(settings):
+	if not "show_status_in_userlist_menus" in settings:
+		settings["show_status_in_userlist_menus"] = SHOW_STATUS_IN_USERLIST_MENU
+	if not "minimum_application_font_point_size" in settings:
+		settings["minimum_application_font_point_size"] = MINIMUM_FONT_SIZE
 	if not "show_window_information_in_status_bar" in settings:
 		settings["show_window_information_in_status_bar"] = DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR
 	if not "subwindow_management_shortcuts_in_windows_menu" in settings:
@@ -2263,6 +2271,8 @@ def load_settings(filename):
 	global WINDOWS_MENU_WINDOW_SHORTCUTS
 	global WINDOWS_MENU_MANAGEMENT_SHORTCUTS
 	global DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR
+	global MINIMUM_FONT_SIZE
+	global SHOW_STATUS_IN_USERLIST_MENU
 
 	if os.path.isfile(filename):
 		with open(filename, "r") as read_settings:
@@ -2272,6 +2282,8 @@ def load_settings(filename):
 		settings = patch_settings(settings)
 		postpatch_length = len(settings)
 
+		SHOW_STATUS_IN_USERLIST_MENU = settings["show_status_in_userlist_menus"]
+		MINIMUM_FONT_SIZE = settings["minimum_application_font_point_size"]
 		DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = settings["show_window_information_in_status_bar"]
 		WINDOWS_MENU_MANAGEMENT_SHORTCUTS = settings["subwindow_management_shortcuts_in_windows_menu"]
 		WINDOWS_MENU_WINDOW_SHORTCUTS = settings["subwindow_shortcuts_in_windows_menu"]

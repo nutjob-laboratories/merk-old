@@ -527,6 +527,11 @@ class Dialog(QDialog):
 
 			self.newfont = font
 
+			# Enforce minimum font point size
+			f = self.newfont.pointSize()
+			if f<config.MINIMUM_FONT_SIZE:
+				self.newfont.setPointSize(config.MINIMUM_FONT_SIZE)
+
 			f = font.toString()
 			pfs = f.split(',')
 			font_name = pfs[0]
@@ -702,12 +707,15 @@ class Dialog(QDialog):
 			if self.ulistContext.isChecked():
 				self.elideAway.setEnabled(True)
 				self.elideHostmask.setEnabled(True)
+				self.statusMenus.setEnabled(True)
 			else:
 				self.elideAway.setEnabled(False)
 				self.elideHostmask.setEnabled(False)
+				self.statusMenus.setEnabled(False)
 		else:
 			self.elideAway.setEnabled(False)
 			self.elideHostmask.setEnabled(False)
+			self.statusMenus.setEnabled(False)
 
 		self.changed.show()
 		self.boldApply()
@@ -1091,11 +1099,9 @@ class Dialog(QDialog):
 	def setDarkMode(self,state):
 		if self.darkMode.isChecked():
 			self.saveButton.setEnabled(False)
-			self.restart.show()
 		else:
 			self.saveButton.setEnabled(True)
-			if not self.changed_advanced_setting:
-				self.restart.hide()
+		self.restart.show()
 		self.changed.show()
 		self.boldApply()
 		self.selector.setFocus()
@@ -1840,6 +1846,7 @@ class Dialog(QDialog):
 			self.channelModes.setEnabled(False)
 		self.do_topic = True
 
+
 	def mainTopicChange(self, i):
 		if self.topicDisplay.isChecked():
 			self.refreshTopics = True
@@ -1888,13 +1895,16 @@ class Dialog(QDialog):
 			self.underlineSelf.setEnabled(True)
 			self.styleSelf.setEnabled(True)
 			self.saveWidth.setEnabled(True)
+			self.statusMenus.setEnabled(True)
 
 			if self.ulistContext.isChecked():
 				self.elideAway.setEnabled(True)
 				self.elideHostmask.setEnabled(True)
+				self.statusMenus.setEnabled(True)
 			else:
 				self.elideAway.setEnabled(False)
 				self.elideHostmask.setEnabled(False)
+				self.statusMenus.setEnabled(False)
 
 			if self.plainUserLists.isChecked():
 				self.styleBots.setEnabled(False)
@@ -1920,6 +1930,7 @@ class Dialog(QDialog):
 			self.styleSelf.setEnabled(False)
 			self.saveWidth.setEnabled(False)
 			self.styleBots.setEnabled(False)
+			self.statusMenus.setEnabled(False)
 
 		self.selector.setFocus()
 		self.changed.show()
@@ -2558,7 +2569,7 @@ class Dialog(QDialog):
 		f = self.selector.font()
 		f.setBold(True)
 		ssize = config.MAXIMUM_FONT_SIZE_FOR_SETTINGS-2
-		if ssize<10: ssize = 10
+		if ssize<config.MINIMUM_FONT_SIZE: ssize = config.MINIMUM_FONT_SIZE
 		f.setPointSize(ssize)
 		self.selector.setFont(f)
 
@@ -4529,7 +4540,7 @@ class Dialog(QDialog):
 		if config.ELIDE_HOSTMASK_IN_USERLIST_CONTEXT: self.elideHostmask.setChecked(True)
 		self.elideHostmask.stateChanged.connect(self.changedSetting)
 
-		self.ulistContext = QCheckBox("User right click menu",self)
+		self.ulistContext = QCheckBox("User right click menu ",self)
 		if config.USERLIST_CONTEXT_MENU: self.ulistContext.setChecked(True)
 		self.ulistContext.stateChanged.connect(self.changedSettingContext)
 
@@ -4562,9 +4573,13 @@ class Dialog(QDialog):
 		if config.LOAD_AND_SAVE_USERLIST_WIDTH: self.saveWidth.setChecked(True)
 		self.saveWidth.stateChanged.connect(self.changedSetting)
 
-		self.styleBots = QCheckBox("Show bots in userlists",self)
+		self.styleBots = QCheckBox("Show bots",self)
 		if config.SHOW_BOTS_IN_USERLISTS: self.styleBots.setChecked(True)
 		self.styleBots.stateChanged.connect(self.changedSettingRerenderUserlists)
+
+		self.statusMenus = QCheckBox("Full status in menu",self)
+		if config.SHOW_STATUS_IN_USERLIST_MENU: self.statusMenus.setChecked(True)
+		self.statusMenus.stateChanged.connect(self.changedSetting)
 
 		if not config.SHOW_USERLIST:
 			self.ulistWidthLabel.setEnabled(False)
@@ -4585,11 +4600,13 @@ class Dialog(QDialog):
 			self.styleSelf.setEnabled(False)
 			self.saveWidth.setEnabled(False)
 			self.styleBots.setEnabled(False)
+			self.statusMenus.setEnabled(False)
 
 		if not config.USERLIST_CONTEXT_MENU:
 			if config.SHOW_USERLIST:
 				self.elideAway.setEnabled(False)
 				self.elideHostmask.setEnabled(False)
+				self.statusMenus.setEnabled(False)
 
 		if config.PLAIN_USER_LISTS:
 			self.styleBots.setEnabled(False)
@@ -4616,12 +4633,12 @@ class Dialog(QDialog):
 		ulistDisplay1 = QFormLayout()
 		ulistDisplay1.setSpacing(0)
 		ulistDisplay1.addRow(self.showUserlists,self.showUserlistLeft)
-		ulistDisplay1.addRow(self.plainUserLists,self.ulistContext)
-		ulistDisplay1.addRow(self.elideAway,self.elideHostmask)
+		ulistDisplay1.addRow(self.plainUserLists,self.styleBots)
 		ulistDisplay1.addRow(self.ignoreUserlist,self.showAwayStatus)
 		ulistDisplay1.addRow(self.colorUserlists,self.noSelectUserlists)
 		ulistDisplay1.addRow(self.underlineSelf,self.styleSelf)
-		ulistDisplay1.addRow(self.styleBots)
+		ulistDisplay1.addRow(self.ulistContext,self.elideHostmask)
+		ulistDisplay1.addRow(self.elideAway,self.statusMenus)
 		ulistDisplay1.addRow(self.hideScroll)
 		ulistDisplay1.addRow(self.dcPrivate)
 
@@ -7877,6 +7894,7 @@ class Dialog(QDialog):
 		config.WINDOWS_MENU_WINDOW_SHORTCUTS = self.showWinShortcuts.isChecked()
 		config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS = self.showWinManShort.isChecked()
 		config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = self.statusInfo.isChecked()
+		config.SHOW_STATUS_IN_USERLIST_MENU = self.statusMenus.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True

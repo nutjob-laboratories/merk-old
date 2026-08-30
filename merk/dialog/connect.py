@@ -531,15 +531,15 @@ class Dialog(QDialog):
 		# 8pt, so we'll just use the regular font size
 		smaller_font = self.font()
 		smaller_point_size = smaller_font.pointSize() - 2
-		if smaller_point_size<8:
-			pass
+		if smaller_point_size<config.MINIMUM_FONT_SIZE:
+			smaller_point_size = config.MINIMUM_FONT_SIZE
 		else:
 			smaller_font.setPointSize(smaller_point_size)
 
 		less_smaller_font = self.font()
 		less_smaller_point_size = less_smaller_font.pointSize() - 1
-		if less_smaller_point_size<8:
-			pass
+		if less_smaller_point_size<config.MINIMUM_FONT_SIZE:
+			smaller_point_size = config.MINIMUM_FONT_SIZE
 		else:
 			less_smaller_font.setPointSize(less_smaller_point_size)
 
@@ -754,12 +754,11 @@ class Dialog(QDialog):
 		self.commands.setStyleSheet(self.generateStylesheet('CodeEditor',config.SYNTAX_FOREGROUND,config.SYNTAX_BACKGROUND))
 		self.commands.highlight_current_line(True)
 
-		height = self.servers.height()+self.reconnect.height()
-
-		if self.not_simplified:
-			height = height + serverLayout.sizeHint().height() + 175
-		else:
-			height = height + serverLayout.sizeHint().height() + 120
+		# Set the height of the connection script editor
+		height = self.servers.sizeHint().height()+self.reconnect.sizeHint().height()
+		fm = QFontMetrics(self.font())
+		height = (fm.height()*9)+10
+		if self.not_simplified: height = height + (fm.height()*4)
 		self.commands.setFixedHeight(height)
 
 		commandsLayout = QVBoxLayout()

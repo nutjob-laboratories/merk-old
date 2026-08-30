@@ -312,6 +312,13 @@ class Dialog(QDialog):
 		self.default = default
 		self.simple = simple
 
+		smaller_font = self.font()
+		smaller_point_size = smaller_font.pointSize() - 2
+		if smaller_point_size<config.MINIMUM_FONT_SIZE:
+			smaller_point_size = config.MINIMUM_FONT_SIZE
+		else:
+			smaller_font.setPointSize(smaller_point_size)
+
 		if default:
 			if self.parent.dark_mode:
 				self.style = styles.loadDarkDefault()
@@ -368,7 +375,7 @@ class Dialog(QDialog):
 
 		self.chat.setStyleSheet(self.generateStylesheet('QTextBrowser',self.fgcolor,self.bgcolor))
 
-		fm = QFontMetrics(self.font())
+		fm = QFontMetrics(smaller_font)
 		fheight = fm.height()
 
 		app_style = self.parent.app.style().metaObject().className()
@@ -398,6 +405,10 @@ class Dialog(QDialog):
 		self.fore = widgets.SyntaxTextColor('fore', "<b>Text Color</b>",self.fgcolor,self)
 		self.back = widgets.SyntaxTextColor('back', "<b>Background Color</b>",self.bgcolor,self)
 
+		self.fore.setFont(smaller_font)
+		self.back.setFont(smaller_font)
+		self.chat.setFont(smaller_font)
+
 		self.fore.syntaxChanged.connect(self.syntaxChanged)
 		self.back.syntaxChanged.connect(self.syntaxChanged)
 
@@ -415,6 +426,8 @@ class Dialog(QDialog):
 		self.userlist.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.userlist.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.userlist.setFocusPolicy(Qt.NoFocus)
+
+		self.userlist.setFont(smaller_font)
 
 		if not config.SHOW_USERLIST:
 			self.userlist.hide()
@@ -516,6 +529,7 @@ class Dialog(QDialog):
 		self.userlist.update()
 
 		dispLayout = QHBoxLayout()
+		dispLayout.setSpacing(2)
 		if config.SHOW_USERLIST_ON_LEFT:
 			dispLayout.addWidget(self.userlist)
 			dispLayout.addWidget(self.chat)
@@ -535,9 +549,9 @@ class Dialog(QDialog):
 		addedDefault = False
 		if self.wchat==None:
 			if self.parent.dark_mode:
-				self.selectWindow.addItem("Default dark mode text style",None)
+				self.selectWindow.addItem("the default dark mode text style",None)
 			else:
-				self.selectWindow.addItem("Default text style",None)
+				self.selectWindow.addItem("the default text style",None)
 			addedDefault = True
 		else:
 			if self.wchat.window_type==SERVER_WINDOW:
@@ -559,9 +573,9 @@ class Dialog(QDialog):
 				self.selectWindow.setItemData(self.selectWindow.count() - 1, bold_font, Qt.FontRole)
 		if not addedDefault:
 			if self.parent.dark_mode:
-				self.selectWindow.addItem("Default dark mode text style",None)
+				self.selectWindow.addItem("the default dark mode text style",None)
 			else:
-				self.selectWindow.addItem("Default text style",None)
+				self.selectWindow.addItem("the default text style",None)
 		for e in self.parent.getAllAllConnectedWindows():
 			if e != self.wchat:
 				if e.window_type==SERVER_WINDOW:
@@ -584,7 +598,10 @@ class Dialog(QDialog):
 		self.selectWindow.currentIndexChanged.connect(self.windowChange)
 		self.selectWindow.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
 
-		self.selectLabel = QLabel("<b>Currently editing text style for</b> ")
+		self.selectLabel = QLabel("<b>Currently editing text style for:</b> ")
+
+		self.selectLabel.setFont(smaller_font)
+		self.selectWindow.setFont(smaller_font)
 
 		selectLayout = QHBoxLayout()
 		selectLayout.addWidget(self.selectLabel)
@@ -600,19 +617,37 @@ class Dialog(QDialog):
 		buttons.accepted.connect(self.accept)
 		buttons.rejected.connect(self.reject)
 
-		buttons.button(QDialogButtonBox.Ok).setText("Apply")
+		apply_button = buttons.button(QDialogButtonBox.Ok)
+		apply_button.setText(" Apply ")
 
-		saveAsButton = QPushButton(" Save style as... ")
+		font = apply_button.font()
+		font.setBold(True)
+		apply_button.setFont(font)
+
+		cancel_button = buttons.button(QDialogButtonBox.Cancel)
+		cancel_button.setText(" Cancel ")
+
+		for button in (apply_button, cancel_button):
+			button.setSizePolicy(
+				QSizePolicy.Expanding,
+				QSizePolicy.Preferred
+			)
+
+		saveAsButton = StylerButton(" Save style as... ")
 		saveAsButton.clicked.connect(self.saveAsStyle)
+		saveAsButton.setFont(smaller_font)
 
-		loadButton = QPushButton(" Load style ")
+		loadButton = StylerButton(" Load style ")
 		loadButton.clicked.connect(self.loadStyle)
+		loadButton.setFont(smaller_font)
 
-		defaultButton = QPushButton(" Set colors to app default ")
+		defaultButton = StylerButton(f" Set colors to {APPLICATION_NAME} default ")
 		defaultButton.clicked.connect(self.loadDefault)
+		defaultButton.setFont(smaller_font)
 
-		self.load_default_button = QPushButton(" Load default ")
+		self.load_default_button = StylerButton(" Load default ")
 		self.load_default_button.clicked.connect(self.loadDefault2)
+		self.load_default_button.setFont(smaller_font)
 
 		if default: self.load_default_button.setEnabled(False)
 
@@ -648,34 +683,40 @@ class Dialog(QDialog):
 		allStyles.addLayout(rightColumn, 0, 2)
 
 		editstyleLayout = QVBoxLayout()
+		editstyleLayout.setSpacing(0)
 		editstyleLayout.addLayout(foregroundBackground)
 		editstyleLayout.addLayout(allStyles)
 		editstyleLayout.setContentsMargins(0,0,0,0)
 
 		styleLayout = QVBoxLayout()
+		styleLayout.setSpacing(0)
 		styleLayout.addLayout(dispLayout)
 		styleLayout.addLayout(editstyleLayout)
 		styleLayout.setContentsMargins(1,1,1,1)
 
-		buttonLayout = QHBoxLayout()
-		buttonLayout.addWidget(loadButton)
-		buttonLayout.addWidget(self.load_default_button)
-		buttonLayout.addWidget(saveAsButton)
-		buttonLayout.addWidget(buttons)
-		buttonLayout.setAlignment(Qt.AlignRight)
-		buttonLayout.setContentsMargins(1,1,1,1)
+		buttonLayout1 = QHBoxLayout()
+		buttonLayout1.setSpacing(0)
+		buttonLayout1.addWidget(loadButton)
+		buttonLayout1.addWidget(self.load_default_button)
+		buttonLayout1.addWidget(saveAsButton)
+		buttonLayout1.setContentsMargins(1,1,1,1)
+
+		button_layout = QHBoxLayout()
+		button_layout.addWidget(cancel_button, 1)
+		button_layout.addWidget(apply_button, 1)
+
+		buttonLayout = QVBoxLayout()
+		buttonLayout.addLayout(buttonLayout1)
+		buttonLayout.addLayout(button_layout)
 
 		if not self.simple:
-			if self.default:
-				dname = "<b>default text style</b>"
+			if self.parent.connected_to_something:
+				sintro = """Select what text style you'd like to edit with the <b>Currently editing text style</b> control, which lists
+				all chat and server windows that are currently open."""
 			else:
-				dname = f"<b>text style for {self.wchat.name}</b>"
+				sintro = ''
 			self.stylerDescription = QLabel(f"""
-				<small>
-				This is the text style editor. Below is an example display, showing what
-				the text style looks like in action. You can select what text style you'd
-				like to edit with the <b>Currently editing text style</b> control, which lists
-				all chat and server windows that are currently open.
+				<small>{sintro}
 				Click <b>Text Color</b> to set the color of text, and <b>Background Color</b>
 				to set the color of the chat and userlist background. Clicking <b>Set colors
 				to app default</b> will set all colors to the default text style built into

@@ -2620,6 +2620,15 @@ class Window(QMainWindow):
 
 		shown_box = False
 
+		if config.SHOW_STATUS_IN_USERLIST_MENU:
+			p = raw_user.split('!')
+			if len(p)==2:
+				display_nickname = p[0]
+			else:
+				display_nickname = raw_user
+		else:
+			display_nickname = user_nick
+
 		if user_nick==self.client.nickname:
 
 			if user_hostmask!=None:
@@ -2635,7 +2644,7 @@ class Window(QMainWindow):
 			
 			if config.SHOW_AWAY_STATUS_IN_USERLISTS:
 				if self.client.is_away:
-					entry = ExtendedMenuItemNoAction(self,ICON,user_nick,dstring,CUSTOM_MENU_ICON_SIZE)
+					entry = ExtendedMenuItemNoAction(self,ICON,display_nickname,dstring,CUSTOM_MENU_ICON_SIZE)
 					self.userlist_menu.addAction(entry)
 
 					status_text = ''
@@ -2679,7 +2688,7 @@ class Window(QMainWindow):
 					self.userlist_menu.addAction(e)
 					shown_box = True
 				else:
-					entry = ExtendedMenuItemNoAction(self,ICON,user_nick,dstring,CUSTOM_MENU_ICON_SIZE)
+					entry = ExtendedMenuItemNoAction(self,ICON,display_nickname,dstring,CUSTOM_MENU_ICON_SIZE)
 					self.userlist_menu.addAction(entry)
 
 					status_text = ''
@@ -2712,7 +2721,7 @@ class Window(QMainWindow):
 							self.userlist_menu.addAction(e)
 							shown_box = True
 			else:
-				entry = ExtendedMenuItemNoAction(self,ICON,user_nick,dstring,CUSTOM_MENU_ICON_SIZE)
+				entry = ExtendedMenuItemNoAction(self,ICON,display_nickname,dstring,CUSTOM_MENU_ICON_SIZE)
 				self.userlist_menu.addAction(entry)
 
 				if is_hidden:
@@ -2728,7 +2737,7 @@ class Window(QMainWindow):
 
 		else:
 			if user_hostmask!=None:
-				entry = ExtendedMenuItemNoAction(self,ICON,user_nick,display_hostmask,CUSTOM_MENU_ICON_SIZE)
+				entry = ExtendedMenuItemNoAction(self,ICON,display_nickname,display_hostmask,CUSTOM_MENU_ICON_SIZE)
 				self.userlist_menu.addAction(entry)
 
 				status_text = ''

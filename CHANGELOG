@@ -45,6 +45,15 @@
   etc), the application will now set the default button to "cancel".
 * Resized the application icon in the resource file to match the size of all
   other icons (48x48).
+* Cleaned up the layout of the text styler. Some of the elements are now smaller
+  to make the dialog a bit slimmer, and the "Apply" and "Cancel" buttons are now
+  "on their own", to make them a bit clearer.
+* Created a setting for the minimum font point size for the application in the
+  configuration file. This can only be changed by the editing the configuration
+  file or with the "/config" command.
+* Added a setting to show all channel status symbols in a user's right click
+  menu in the userlist. The setting has been added to the "Settings" dialog, on
+  the "Channels" page.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

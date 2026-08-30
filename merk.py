@@ -638,6 +638,10 @@ if __name__ == '__main__':
 		# Set the font set in the config file
 		font = QFont()
 		font.fromString(config.APPLICATION_FONT)
+		# Enforce minimum font point size
+		f = font.pointSize()
+		if f<config.MINIMUM_FONT_SIZE:
+			font.setPointSize(config.MINIMUM_FONT_SIZE)
 		app.setFont(font)
 	else:
 		# Load in fonts from the resources 

@@ -88,7 +88,7 @@ def ShowFileDialog(self,msg,show_open=True):
 	if show_open:
 		options = QFileDialog.Options()
 		options |= QFileDialog.DontUseNativeDialog
-		fileName, _ = QFileDialog.getOpenFileName(self,f"{msg}", config.CONFIG_DIRECTORY, "All Files (*)", options=options)
+		fileName, _ = QFileDialog.getOpenFileName(self,f"{msg}", QDir.homePath(), "All Files (*)", options=options)
 		if fileName:
 			return fileName
 		else:
@@ -96,7 +96,7 @@ def ShowFileDialog(self,msg,show_open=True):
 	else:
 		options = QFileDialog.Options()
 		options |= QFileDialog.DontUseNativeDialog
-		fileName, _ = QFileDialog.getSaveFileName(self,f"{msg}",config.CONFIG_DIRECTORY,"All Files (*)", options=options)
+		fileName, _ = QFileDialog.getSaveFileName(self,f"{msg}",QDir.homePath(),"All Files (*)", options=options)
 		if fileName:
 			return fileName
 		else:

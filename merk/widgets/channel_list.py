@@ -113,7 +113,7 @@ class Window(QMainWindow):
 		self.moreFifty.toggled.connect(self.doReset)
 
 		smaller_size = self.parent.app.font().pointSize() - 2
-		if smaller_size<8: smaller_size = 8
+		if smaller_size<config.MINIMUM_FONT_SIZE: smaller_size = config.MINIMUM_FONT_SIZE
 		f = self.font()
 		f.setPointSize(smaller_size)
 		self.moreFive.setFont(f)
