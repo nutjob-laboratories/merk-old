@@ -949,7 +949,7 @@ class Dialog(QDialog):
 			self.autocompleteCommands.setEnabled(True)
 			self.autocompleteNicks.setEnabled(True)
 			self.autocompleteChans.setEnabled(True)
-			self.autocompleteServers.setEnabled(False)
+			self.autocompleteServers.setEnabled(True)
 			if self.enableEmojis.isChecked() or self.enableAscii.isChecked():
 				self.autocompleteEmojis.setEnabled(True)
 			else:
@@ -3644,7 +3644,7 @@ class Dialog(QDialog):
 		if config.SHOW_USER_INFO_ON_CHAT_WINDOWS: self.showInfo.setChecked(True)
 		self.showInfo.stateChanged.connect(self.changedSettingRerenderNickShow)
 		
-		self.showInputMenu = QCheckBox("Show input menu button",self)
+		self.showInputMenu = QCheckBox("Show input options menu button",self)
 		if config.SHOW_INPUT_MENU: self.showInputMenu.setChecked(True)
 		self.showInputMenu.stateChanged.connect(self.changedSettingInputMenu)
 

@@ -5,6 +5,7 @@
 What's new:
 
 - **Many dialogs have been made easier to use for users that are new to IRC**.
+- **The options in the input options menu will *only* have an effect on the subwindow it was used on**. This allows users to temporarily disable MERK markdown, emojis, ASCIImojis, IRC color input, or change the spellchecking language for a specific subwindow.
 - **The `QUIT` message bug has been fixed**. When disconnecting from a server with the `/quit` command, the quit message was not always being sent to the server.
 - **Many, many bugfixes**.
 
@@ -71,6 +72,19 @@ What's new:
 * Added an option to toggle the "edit installed/connection scripts and plugins"
   options in the "Tools" menu. The setting has been added to the config file
   and the "Settings" dialog, on the "Menubar" page.
+* Moved alias interpolation/emoji/ASCIImoji/markdown injection to individual
+  subwindows, rather than from the "main" application module.
+* All of the options in the input options menu now ONLY affect the current
+  subwindow, rather than setting a global setting. This matches how the
+  spellcheck menu has worked for a few dozen versions. If all of the options
+  that can be en/disabled or executed in the input options menu are disabled,
+  the input options button will be hidden
+* Removed the ability to toggle input highlighting and autocomplete from the
+  input options menu. The only way to toggle these settings is from the
+  "Settings" dialog, from the "Settings" menu, or with the "/config" command.
+* Bugfix: the "Servers" option for autocomplete on the "Input" section of the
+  "Settings" dialog would be disabled even if "autocomplete" was enabled if
+  had ever been disabled.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

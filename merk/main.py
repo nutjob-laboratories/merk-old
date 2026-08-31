@@ -3150,7 +3150,6 @@ class Merk(QMainWindow):
 		t = Message(ERROR_MESSAGE,'',f"\"{user_input}\" is not a recognized command")
 		window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
-
 	def handleUserInput(self,window,user_input):
 
 		# Handle chat commands
@@ -3158,18 +3157,6 @@ class Merk(QMainWindow):
 
 		# Handle common commands
 		if commands.handleCommonCommands(self,window,user_input): return
-
-		commands.buildTemporaryAliases(self,window)
-		if config.INTERPOLATE_ALIASES_INTO_INPUT==True:
-			user_input = commands.interpolateAliases(user_input)
-
-		# Handle MERK markup
-		if config.ENABLE_MARKDOWN_MARKUP: user_input = markdown_to_irc(user_input)
-		if config.ENABLE_IRC_COLOR_MARKUP: user_input = inject_irc_colors(user_input)
-		
-		# Add emojis to the message
-		if config.ENABLE_EMOJI_SHORTCODES: user_input = emojize(user_input,config.EMOJI_LANGUAGE)
-		if config.ENABLE_ASCIIMOJI_SHORTCODES: user_input = asciimojize(user_input)
 
 		if len(user_input)>0:
 

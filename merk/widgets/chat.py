@@ -259,6 +259,11 @@ class Window(QMainWindow):
 		self.plugin_title = None
 		self.connection_time = datetime.timestamp(datetime.now())
 
+		self.use_markdown = config.ENABLE_MARKDOWN_MARKUP
+		self.use_color = config.ENABLE_IRC_COLOR_MARKUP
+		self.use_emoji = config.ENABLE_EMOJI_SHORTCODES
+		self.use_asciimoji = config.ENABLE_ASCIIMOJI_SHORTCODES
+
 		# The window's opacity starts at 100%
 		self.opacity = 100
 
@@ -569,6 +574,8 @@ class Window(QMainWindow):
 		""")
 
 		if not config.SHOW_INPUT_MENU: self.settingsButton.hide()
+
+		if not self.testForInputMenu(): self.settingsButton.hide()
 
 		if self.window_type!=SERVER_WINDOW:
 
@@ -1869,107 +1876,82 @@ class Window(QMainWindow):
 			return False
 
 	def settingsMarkdown(self):
-		if config.ENABLE_MARKDOWN_MARKUP:
-			config.ENABLE_MARKDOWN_MARKUP = False
+		if self.use_markdown:
+			self.use_markdown = False
 		else:
-			config.ENABLE_MARKDOWN_MARKUP = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.parent.buildSettingsMenu()
+			self.use_markdown = True
+		self.buildInputOptionsMenu()
 
 	def settingsInputColor(self):
-		if config.ENABLE_IRC_COLOR_MARKUP:
-			config.ENABLE_IRC_COLOR_MARKUP = False
+		if self.use_color:
+			self.use_color = False
 		else:
-			config.ENABLE_IRC_COLOR_MARKUP = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.parent.buildSettingsMenu()
+			self.use_color = True
+		self.buildInputOptionsMenu()
 
 	def settingsEmoji(self):
-		if config.ENABLE_EMOJI_SHORTCODES:
-			config.ENABLE_EMOJI_SHORTCODES = False
+		if self.use_emoji:
+			self.use_emoji = False
 		else:
-			config.ENABLE_EMOJI_SHORTCODES = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.parent.buildSettingsMenu()
+			self.use_emoji = True
+		self.buildInputOptionsMenu()
 
 	def settingsAsciimoji(self):
-		if config.ENABLE_ASCIIMOJI_SHORTCODES:
-			config.ENABLE_ASCIIMOJI_SHORTCODES = False
+		if self.use_asciimoji:
+			self.use_asciimoji = False
 		else:
-			config.ENABLE_ASCIIMOJI_SHORTCODES = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.parent.buildSettingsMenu()
+			self.use_asciimoji = True
+		self.buildInputOptionsMenu()
 
-	def settingsHighlight(self):
-		if config.APPLY_SYNTAX_STYLES_TO_INPUT_WIDGET:
-			config.APPLY_SYNTAX_STYLES_TO_INPUT_WIDGET = False
+	def testForInputMenu(self):
+		if not config.ENABLE_MARKDOWN_MARKUP and not config.ENABLE_IRC_COLOR_MARKUP and not config.ENABLE_EMOJI_SHORTCODES and not config.ENABLE_ASCIIMOJI_SHORTCODES and not config.ENABLE_SPELLCHECK and not config.SCRIPTING_ENGINE_ENABLED:
+			return False
 		else:
-			config.APPLY_SYNTAX_STYLES_TO_INPUT_WIDGET = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.resetInput()
-		self.parent.buildSettingsMenu()
-
-	def settingsAuto(self):
-		if config.ENABLE_AUTOCOMPLETE:
-			config.ENABLE_AUTOCOMPLETE = False
-		else:
-			config.ENABLE_AUTOCOMPLETE = True
-		self.save_config()
-		self.parent.rebuildAllInputMenus()
-		self.parent.buildSettingsMenu()
+			return True
 
 	def buildInputOptionsMenu(self):
+
+		if hasattr(self,"settingsButton"):
+			if self.testForInputMenu():
+				self.settingsButton.show()
+			else:
+				self.settingsButton.hide()
+
+			if not config.SHOW_INPUT_MENU: self.settingsButton.hide()
 
 		self.settingsMenu.clear()
 
 		if config.ENABLE_MARKDOWN_MARKUP:
-			self.mdInput = QAction(QIcon(self.parent.checked_icon),"Use markdown input", self)
-		else:
-			self.mdInput = QAction(QIcon(self.parent.unchecked_icon),"Use markdown input", self)
-		self.mdInput.triggered.connect(self.settingsMarkdown)
-		self.settingsMenu.addAction(self.mdInput)
+			if self.use_markdown:
+				self.mdInput = QAction(QIcon(self.parent.checked_icon),"Use markdown input", self)
+			else:
+				self.mdInput = QAction(QIcon(self.parent.unchecked_icon),"Use markdown input", self)
+			self.mdInput.triggered.connect(self.settingsMarkdown)
+			self.settingsMenu.addAction(self.mdInput)
 
 		if config.ENABLE_IRC_COLOR_MARKUP:
-			self.colorInput = QAction(QIcon(self.parent.checked_icon),"Use IRC color input", self)
-		else:
-			self.colorInput = QAction(QIcon(self.parent.unchecked_icon),"Use IRC color input", self)
-		self.colorInput.triggered.connect(self.settingsInputColor)
-		self.settingsMenu.addAction(self.colorInput)
+			if self.use_color:
+				self.colorInput = QAction(QIcon(self.parent.checked_icon),"Use IRC color input", self)
+			else:
+				self.colorInput = QAction(QIcon(self.parent.unchecked_icon),"Use IRC color input", self)
+			self.colorInput.triggered.connect(self.settingsInputColor)
+			self.settingsMenu.addAction(self.colorInput)
 
 		if config.ENABLE_EMOJI_SHORTCODES:
-			self.emojiInput = QAction(QIcon(self.parent.checked_icon),"Use emoji shortcodes", self)
-		else:
-			self.emojiInput = QAction(QIcon(self.parent.unchecked_icon),"Use emoji shortcodes", self)
-		self.emojiInput.triggered.connect(self.settingsEmoji)
-		self.settingsMenu.addAction(self.emojiInput)
+			if self.use_emoji:
+				self.emojiInput = QAction(QIcon(self.parent.checked_icon),"Use emoji shortcodes", self)
+			else:
+				self.emojiInput = QAction(QIcon(self.parent.unchecked_icon),"Use emoji shortcodes", self)
+			self.emojiInput.triggered.connect(self.settingsEmoji)
+			self.settingsMenu.addAction(self.emojiInput)
 
 		if config.ENABLE_ASCIIMOJI_SHORTCODES:
-			self.asciimojiInput = QAction(QIcon(self.parent.checked_icon),"Use ASCIImoji shortcodes", self)
-		else:
-			self.asciimojiInput = QAction(QIcon(self.parent.unchecked_icon),"Use ASCIImoji shortcodes", self)
-		self.asciimojiInput.triggered.connect(self.settingsAsciimoji)
-		self.settingsMenu.addAction(self.asciimojiInput)
-
-		self.settingsMenu.addSeparator()
-
-		if config.APPLY_SYNTAX_STYLES_TO_INPUT_WIDGET:
-			self.highlightInput = QAction(QIcon(self.parent.checked_icon),"Highlight input", self)
-		else:
-			self.highlightInput = QAction(QIcon(self.parent.unchecked_icon),"Highlight input", self)
-		self.highlightInput.triggered.connect(self.settingsHighlight)
-		self.settingsMenu.addAction(self.highlightInput)
-
-		if config.ENABLE_AUTOCOMPLETE:
-			self.autoInput = QAction(QIcon(self.parent.checked_icon),"Use autocomplete", self)
-		else:
-			self.autoInput = QAction(QIcon(self.parent.unchecked_icon),"Use autocomplete", self)
-		self.autoInput.triggered.connect(self.settingsAuto)
-		self.settingsMenu.addAction(self.autoInput)
+			if self.use_asciimoji:
+				self.asciimojiInput = QAction(QIcon(self.parent.checked_icon),"Use ASCIImoji shortcodes", self)
+			else:
+				self.asciimojiInput = QAction(QIcon(self.parent.unchecked_icon),"Use ASCIImoji shortcodes", self)
+			self.asciimojiInput.triggered.connect(self.settingsAsciimoji)
+			self.settingsMenu.addAction(self.asciimojiInput)
 
 		# Spellcheck Button
 		if config.ENABLE_SPELLCHECK:
@@ -2027,10 +2009,11 @@ class Window(QMainWindow):
 
 			if config.ALLOW_MENUS_TO_CHANGE_SPELLCHECK_SETTINGS: self.settingsMenu.addMenu(self.spellcheckMenu)
 
-		self.settingsMenu.addSeparator()
-
 		if config.SCRIPTING_ENGINE_ENABLED:
-			entry = QAction(QIcon(RUN_ICON),"Run script",self)
+
+			self.settingsMenu.addSeparator()
+
+			entry = QAction(QIcon(RUN_ICON),"Run a script on this window",self)
 			entry.triggered.connect(self.loadScript)
 			self.settingsMenu.addAction(entry)
 
@@ -3992,6 +3975,19 @@ class Window(QMainWindow):
 		# ==============================
 		# END COMMAND HISTORY MANAGEMENT
 		# ==============================
+
+		# Interpolate aliases
+		if config.INTERPOLATE_ALIASES_INTO_INPUT==True:
+			commands.buildTemporaryAliases(self.parent,self)
+			user_input = commands.interpolateAliases(user_input)
+
+		# Handle MERK markup
+		if config.ENABLE_MARKDOWN_MARKUP and self.use_markdown: user_input = markdown_to_irc(user_input)
+		if config.ENABLE_IRC_COLOR_MARKUP and self.use_color: user_input = inject_irc_colors(user_input)
+		
+		# Add emojis to the message
+		if config.ENABLE_EMOJI_SHORTCODES and self.use_emoji: user_input = emojize(user_input,config.EMOJI_LANGUAGE)
+		if config.ENABLE_ASCIIMOJI_SHORTCODES and self.use_asciimoji: user_input = asciimojize(user_input)
 
 		# Pass the input (and window) to the parent
 		# to process input
