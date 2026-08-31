@@ -81,7 +81,7 @@ class Dialog(QDialog):
 		self.script_name = ''
 
 		self.setWindowTitle("Execute script")
-		self.setWindowIcon(QIcon(COMMAND_ICON))
+		self.setWindowIcon(QIcon(SCRIPT_ICON))
 
 		nameLayout = QHBoxLayout()
 		self.nameLabel = QLabel("<b>Filename:&nbsp;</b>")

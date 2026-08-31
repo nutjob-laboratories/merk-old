@@ -911,7 +911,7 @@ class Window(QMainWindow):
 				self.oscript_menu = self.fileMenu.addMenu(QIcon(OPENFILE_ICON),"Open script")
 
 				for f in file_paths:
-					entry = QAction(QIcon(COMMAND_ICON),os.path.basename(f),self)
+					entry = QAction(QIcon(SCRIPT_ICON),os.path.basename(f),self)
 					entry.triggered.connect(lambda state,h=f: self.readFile(h))
 					self.oscript_menu.addAction(entry)
 
@@ -919,7 +919,7 @@ class Window(QMainWindow):
 				self.cscript_menu = self.fileMenu.addMenu(QIcon(OPENFILE_ICON),"Open connection script")
 
 				for host in user.COMMANDS:
-					entry = QAction(QIcon(COMMAND_ICON),f"{host}",self)
+					entry = QAction(QIcon(SCRIPT_ICON),f"{host}",self)
 					entry.triggered.connect(lambda state,x=host,f=user.COMMANDS[host]: self.readConnect(x,f))
 					self.cscript_menu.addAction(entry)
 

@@ -3294,13 +3294,21 @@ class Dialog(QDialog):
 		menu2Layout.addStretch()
 		menu2Layout.addWidget(self.menubarBold)
 
+		self.showFileEdit = QCheckBox(f"Edit files in \"{config.MAIN_MENU_TOOLS_NAME}\" menu",self)
+		if config.SHOW_FILE_EDITING_IN_TOOLS: self.showFileEdit.setChecked(True)
+		self.showFileEdit.stateChanged.connect(self.changedSetting)
+
+		llMenuLayout = QHBoxLayout()
+		llMenuLayout.addWidget(self.menubarMenu)
+		llMenuLayout.addWidget(self.showFileEdit)
+
 		msLayout = QVBoxLayout()
 		msLayout.setSpacing(2)
 		msLayout.addWidget(self.menubarDescription)
 		msLayout.addLayout(menu1Layout)
 		msLayout.addLayout(menu2Layout)
 		msLayout.addLayout(justifyLayout)
-		msLayout.addWidget(self.menubarMenu)
+		msLayout.addLayout(llMenuLayout)
 
 		menuLayout = QVBoxLayout()
 		menuLayout.setSpacing(0)
@@ -4520,7 +4528,7 @@ class Dialog(QDialog):
 		if config.USERLIST_ITEMS_NON_SELECTABLE: self.noSelectUserlists.setChecked(True)
 		self.noSelectUserlists.stateChanged.connect(self.changedSettingRerenderUserlists)
 
-		self.ignoreUserlist = QCheckBox("Mark ignored users",self)
+		self.ignoreUserlist = QCheckBox("Mark ignored users ",self)
 		if config.SHOW_IGNORE_STATUS_IN_USERLISTS: self.ignoreUserlist.setChecked(True)
 		self.ignoreUserlist.stateChanged.connect(self.changedSettingRerenderUserlists)
 
@@ -4540,7 +4548,7 @@ class Dialog(QDialog):
 		if config.ELIDE_HOSTMASK_IN_USERLIST_CONTEXT: self.elideHostmask.setChecked(True)
 		self.elideHostmask.stateChanged.connect(self.changedSetting)
 
-		self.ulistContext = QCheckBox("User right click menu ",self)
+		self.ulistContext = QCheckBox("Enable right click menu ",self)
 		if config.USERLIST_CONTEXT_MENU: self.ulistContext.setChecked(True)
 		self.ulistContext.stateChanged.connect(self.changedSettingContext)
 
@@ -4577,7 +4585,7 @@ class Dialog(QDialog):
 		if config.SHOW_BOTS_IN_USERLISTS: self.styleBots.setChecked(True)
 		self.styleBots.stateChanged.connect(self.changedSettingRerenderUserlists)
 
-		self.statusMenus = QCheckBox("Full status in menu",self)
+		self.statusMenus = QCheckBox("Full channel status",self)
 		if config.SHOW_STATUS_IN_USERLIST_MENU: self.statusMenus.setChecked(True)
 		self.statusMenus.stateChanged.connect(self.changedSetting)
 
@@ -4637,8 +4645,6 @@ class Dialog(QDialog):
 		ulistDisplay1.addRow(self.ignoreUserlist,self.showAwayStatus)
 		ulistDisplay1.addRow(self.colorUserlists,self.noSelectUserlists)
 		ulistDisplay1.addRow(self.underlineSelf,self.styleSelf)
-		ulistDisplay1.addRow(self.ulistContext,self.elideHostmask)
-		ulistDisplay1.addRow(self.elideAway,self.statusMenus)
 		ulistDisplay1.addRow(self.hideScroll)
 		ulistDisplay1.addRow(self.dcPrivate)
 
@@ -4706,17 +4712,22 @@ class Dialog(QDialog):
 		showCM.setSpacing(0)
 		showCM.addLayout(showCM3)
 
+		ulistMenu = QFormLayout()
+		ulistMenu.setSpacing(0)
+		ulistMenu.addRow(self.ulistContext,self.elideHostmask)
+		ulistMenu.addRow(self.elideAway,self.statusMenus)
+
 		menuLayout = QVBoxLayout()
 		menuLayout.setSpacing(0)
 		menuLayout.addWidget(widgets.textSeparatorLabel(self,"<b>channel information display</b>"))
 		menuLayout.addWidget(self.channelDescription)
 		menuLayout.addLayout(infoExist)
-		menuLayout.addWidget(QLabel(' '))
-		menuLayout.addWidget(widgets.textSeparatorLabel(self,"<b>channel information display settings</b>"))
 		menuLayout.addLayout(chanButtonLayout)
 		menuLayout.addWidget(QLabel(' '))
 		menuLayout.addWidget(widgets.textSeparatorLabel(self,"<b>user list settings</b>"))
 		menuLayout.addLayout(ulistDisplay)
+		menuLayout.addWidget(widgets.textSeparatorLabel(self,"<b>user list right click menu</b>"))
+		menuLayout.addLayout(ulistMenu)
 		menuLayout.addWidget(QLabel(' '))
 		menuLayout.addWidget(widgets.textSeparatorLabel(self,"<b>show message types in all channels</b>"))
 		menuLayout.addLayout(cfLayout)
@@ -6121,7 +6132,7 @@ class Dialog(QDialog):
 		entry.setTextAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
 		entry.setText("Commands")
 		entry.widget = self.scriptingPage
-		entry.setIcon(QIcon(COMMAND_ICON))
+		entry.setIcon(QIcon(SCRIPT_ICON))
 		self.selector.addItem(entry)
 
 		self.stack.addWidget(self.scriptingPage)
@@ -7895,6 +7906,7 @@ class Dialog(QDialog):
 		config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS = self.showWinManShort.isChecked()
 		config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = self.statusInfo.isChecked()
 		config.SHOW_STATUS_IN_USERLIST_MENU = self.statusMenus.isChecked()
+		config.SHOW_FILE_EDITING_IN_TOOLS = self.showFileEdit.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True

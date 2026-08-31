@@ -815,7 +815,7 @@ class Dialog(QDialog):
 		if config.SCRIPTING_ENGINE_ENABLED:
 			self.commands_tab = QWidget()
 			self.commands_tab.setLayout(commandsLayout)
-			self.tabs.addTab(self.commands_tab, QIcon(COMMAND_ICON), "Script")
+			self.tabs.addTab(self.commands_tab, QIcon(SCRIPT_ICON), "Script")
 
 		buttons = QDialogButtonBox(self)
 		buttons.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)

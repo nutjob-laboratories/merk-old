@@ -1287,7 +1287,7 @@ class Window(QMainWindow):
 		msgBox = QMessageBox()
 		msgBox.setIconPixmap(QPixmap(SHOW_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
-		msgBox.setText("Unban all banned users in <b>"+self.name+"</b>?")
+		msgBox.setText(f"Unban all banned users in <b>{self.name}</b>?")
 		msgBox.setWindowTitle("Unban All")
 		
 		default_button = msgBox.addButton(" Unban all users ", QMessageBox.AcceptRole)
@@ -1307,7 +1307,28 @@ class Window(QMainWindow):
 				self.client.batch.append(f"MODE {self.name} -b {u}")
 
 	def unbanUser(self,user,menu):
-		self.client.sendLine(f"MODE {self.name} -b {user}")
+		do_unban = True
+
+		msgBox = QMessageBox()
+		msgBox.setIconPixmap(QPixmap(SHOW_ICON))
+		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
+		msgBox.setText(f"Unban <b>{user}/b> from <b>{self.name}</b>?")
+		msgBox.setWindowTitle("Unban User")
+		
+		default_button = msgBox.addButton(" Unban user ", QMessageBox.AcceptRole)
+		cancel_button = msgBox.addButton(" Cancel ", QMessageBox.RejectRole)
+		msgBox.setDefaultButton(cancel_button)
+
+		f = default_button.font()
+		f.setBold(True)
+		default_button.setFont(f)
+
+		rval = msgBox.exec()
+		if rval == QMessageBox.RejectRole:
+			do_unban = False
+
+		if do_unban:
+			self.client.sendLine(f"MODE {self.name} -b {user}")
 		menu.close()
 
 	def rerenderChatLogMenu(self):
@@ -1329,15 +1350,6 @@ class Window(QMainWindow):
 		if config.SHOW_CHAT_CONTEXT_MENUS and self.chat.textCursor().hasSelection()==False:
 
 			if self.window_type==SERVER_WINDOW:
-
-				menu.addSeparator()
-
-				if config.SCRIPTING_ENGINE_ENABLED:
-					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
-					entry.triggered.connect(lambda state: self.loadScript(True))
-					menu.addAction(entry)
-
-					if not self.client.registered: entry.setEnabled(False)
 
 				menu.addSeparator()
 
@@ -1389,11 +1401,12 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
-				if config.ENABLE_STYLE_EDITOR:
-					if not config.FORCE_DEFAULT_STYLE:
-						entry = QAction(QIcon(STYLE_ICON),"Edit text style",menu)
-						entry.triggered.connect(self.pressedStyleButton)
-						menu.addAction(entry)
+				if config.SCRIPTING_ENGINE_ENABLED:
+					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
+					entry.triggered.connect(lambda state: self.loadScript(True))
+					menu.addAction(entry)
+
+					if not self.client.registered: entry.setEnabled(False)
 
 				if config.SCRIPTING_ENGINE_ENABLED:
 					hostid = self.client.server+":"+str(self.client.port)
@@ -1403,6 +1416,12 @@ class Window(QMainWindow):
 						entry = QAction(QIcon(SCRIPT_ICON),"Create connection script",menu)
 					entry.triggered.connect(lambda state,h=hostid: self.parent.openEditorConnect(h))
 					menu.addAction(entry)
+
+				if config.ENABLE_STYLE_EDITOR:
+					if not config.FORCE_DEFAULT_STYLE:
+						entry = QAction(QIcon(STYLE_ICON),"Edit text style",menu)
+						entry.triggered.connect(self.pressedStyleButton)
+						menu.addAction(entry)
 
 				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide server window",menu)
 				entry.triggered.connect(lambda state: self.parent.hideSubWindow(self.subwindow_id))
@@ -1423,15 +1442,6 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 			if self.window_type!=SERVER_WINDOW:
-
-				menu.addSeparator()
-
-				if config.SCRIPTING_ENGINE_ENABLED:
-					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
-					entry.triggered.connect(lambda state: self.loadScript(True))
-					menu.addAction(entry)
-
-					if not self.client.registered: entry.setEnabled(False)
 
 				menu.addSeparator()
 
@@ -1603,8 +1613,6 @@ class Window(QMainWindow):
 
 			if self.window_type==CHANNEL_WINDOW:
 
-				menu.addSeparator()
-
 				if not self.areAllTypesFiltered():
 
 					if self.window_type==CHANNEL_WINDOW:
@@ -1743,11 +1751,12 @@ class Window(QMainWindow):
 
 						menu.addMenu(fMenu)
 
-				if config.ENABLE_STYLE_EDITOR:
-					if not config.FORCE_DEFAULT_STYLE:
-						entry = QAction(QIcon(STYLE_ICON),"Edit text style",menu)
-						entry.triggered.connect(self.pressedStyleButton)
-						menu.addAction(entry)
+				menu.addSeparator()
+
+				if config.SCRIPTING_ENGINE_ENABLED:
+					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
+					entry.triggered.connect(lambda state: self.loadScript(True))
+					menu.addAction(entry)
 
 				if config.EXECUTE_CHANNEL_SCRIPTS and config.SCRIPTING_ENGINE_ENABLED:
 					cscript = commands.find_script(self.encodeScriptFilename(),None)
@@ -1757,6 +1766,12 @@ class Window(QMainWindow):
 						entry = QAction(QIcon(SCRIPT_ICON),"Create channel script",menu)
 					entry.triggered.connect(lambda state,h=self.encodeScriptFilename(): self.parent.newEditorWindowSave(h))
 					menu.addAction(entry)
+
+				if config.ENABLE_STYLE_EDITOR:
+					if not config.FORCE_DEFAULT_STYLE:
+						entry = QAction(QIcon(STYLE_ICON),"Edit text style",menu)
+						entry.triggered.connect(self.pressedStyleButton)
+						menu.addAction(entry)
 
 				entry = QAction(QIcon(HIDE_WINDOW_ICON),"Hide channel window",menu)
 				entry.triggered.connect(lambda state: self.parent.hideSubWindow(self.subwindow_id))
@@ -1774,6 +1789,11 @@ class Window(QMainWindow):
 			if self.window_type==PRIVATE_WINDOW:
 
 				menu.addSeparator()
+
+				if config.SCRIPTING_ENGINE_ENABLED:
+					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
+					entry.triggered.connect(lambda state: self.loadScript(True))
+					menu.addAction(entry)
 
 				if config.ENABLE_STYLE_EDITOR:
 					if not config.FORCE_DEFAULT_STYLE:

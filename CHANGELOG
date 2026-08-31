@@ -2,6 +2,12 @@
 |                                   0.052.250                                  |
 |------------------------------------------------------------------------------|
 
+What's new:
+
+- **Many dialogs have been made easier to use for users that are new to IRC**.
+- **The `QUIT` message bug has been fixed**. When disconnecting from a server with the `/quit` command, the quit message was not always being sent to the server.
+- **Many, many bugfixes**.
+
 |==============================================================================|
 |                              APPLICATION CHANGES                             |
 |==============================================================================|
@@ -54,6 +60,17 @@
 * Added a setting to show all channel status symbols in a user's right click
   menu in the userlist. The setting has been added to the "Settings" dialog, on
   the "Channels" page.
+* Added a messagebox to ask the user if they're sure they want to unban specific
+  users.
+* Rearranged the "Tools" menu.
+* Cleaned up some of the icons. The "command" icon was removed, and instead the
+  "script" icon is used wherever it was used.
+* Rearranged the various subwindow right click menus.
+* Re-worked the "Windows" menu. All subwindows now appear at the top, and the
+  server submenus are now under a "header" at the bottom of the subwindow list.
+* Added an option to toggle the "edit installed/connection scripts and plugins"
+  options in the "Tools" menu. The setting has been added to the config file
+  and the "Settings" dialog, on the "Menubar" page.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

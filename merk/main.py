@@ -3892,6 +3892,28 @@ class Merk(QMainWindow):
 
 		return w
 
+	def newEditorPluginBlank(self):
+		w = MerkSubwindow(self)
+		w.setWidget(widgets.ScriptEditor(None,self,w,True,True))
+		w.resize(config.DEFAULT_SUBWINDOW_WIDTH,config.DEFAULT_SUBWINDOW_HEIGHT)
+		w.setWindowIcon(QIcon(PYTHON_ICON))
+		w.setAttribute(Qt.WA_DeleteOnClose)
+		w.setBackground(config.SUBWINDOW_BACKGROUND)
+		self.MDI.addSubWindow(w)
+		self.toolsMenu.close()
+		self.buildWindowsMenu()
+		w.show()
+
+		if config.RUBBER_BAND_RESIZE:
+			w.setOption(QMdiSubWindow.RubberBandResize, True)
+
+		if config.RUBBER_BAND_MOVE:
+			w.setOption(QMdiSubWindow.RubberBandMove, True)
+
+		if config.MAXIMIZE_SUBWINDOWS_ON_CREATION: w.showMaximized()
+
+		return w
+
 	def newEditorPluginFile(self,filename):
 		w = MerkSubwindow(self)
 		w.setWidget(widgets.ScriptEditor(filename,self,w,True))
@@ -5300,10 +5322,6 @@ class Merk(QMainWindow):
 			entry = widgets.ExtendedMenuItem(self,STYLE_MENU_ICON,'Style Editor','Edit text styles&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuEditStyle)
 			self.toolsMenu.addAction(entry)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
-			entry = widgets.ExtendedMenuItem(self,SCRIPT_MENU_ICON,'Script Editor','Edit '+APPLICATION_NAME+' scripts&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.newEditorWindow)
-			self.toolsMenu.addAction(entry)
-
 		if config.ENABLE_HOTKEYS:
 			entry = widgets.ExtendedMenuItem(self,HOTKEY_MENU_ICON,'Hotkeys','Create, edit, and save&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openHotkeys)
 			self.toolsMenu.addAction(entry)
@@ -5312,61 +5330,68 @@ class Merk(QMainWindow):
 			entry = widgets.ExtendedMenuItem(self,HIDE_MENU_ICON,'Ignores','Manage ignored users&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openIgnore)
 			self.toolsMenu.addAction(entry)
 
-		if config.ENABLE_PLUGINS:
-			entry = widgets.ExtendedMenuItem(self,PLUGIN_MENU_ICON,'Plugins','Create, edit, and install&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openPlugin)
-			self.toolsMenu.addAction(entry)
-
 		if(len(os.listdir(logs.LOG_DIRECTORY))!=0):
 			entry = widgets.ExtendedMenuItem(self,LOG_MENU_ICON,'Logs','View, manage, or export&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuExportLog)
 			self.toolsMenu.addAction(entry)
 
-		self.toolsMenu.addSeparator()
-
 		if config.SCRIPTING_ENGINE_ENABLED:
-			file_paths = []
-			for root, _, files in os.walk(commands.SCRIPTS_DIRECTORY):
-				for file in files:
-					file_paths.append(os.path.join(root, file))
-			file_paths = list(set(file_paths))
-			if len(file_paths)>0:
-				sm = self.toolsMenu.addMenu(QIcon(COMMAND_ICON),"Installed Scripts")
-
-				for f in file_paths:
-					entry = QAction(QIcon(SCRIPT_ICON),f"{os.path.basename(f)}",self)
-					entry.triggered.connect(lambda state,h=f: self.openEditor(h))
-					sm.addAction(entry)
-
-			if len(user.COMMANDS)>0:
-				sm = self.toolsMenu.addMenu(QIcon(CONNECT_ICON),"Connection Scripts")
-
-				for f in user.COMMANDS:
-					entry = QAction(QIcon(SCRIPT_ICON),f"{f}",self)
-					entry.triggered.connect(lambda state,h=f: self.openEditorConnect(h))
-					sm.addAction(entry)
+			entry = widgets.ExtendedMenuItem(self,SCRIPT_MENU_ICON,'Script Editor','Edit '+APPLICATION_NAME+' scripts&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.newEditorWindow)
+			self.toolsMenu.addAction(entry)
 
 		if config.ENABLE_PLUGINS:
-			if len(plugins.PLUGINS)>0:
-				sm = self.toolsMenu.addMenu(QIcon(PYTHON_ICON),"Installed Plugins")
-				for obj in plugins.PLUGINS:
-					filename = obj._filename
-					basename = obj._basename
-					events = obj._events
-					classname = obj._class
-					NAME = obj.NAME
-					VERSION = obj.VERSION
-					icon = obj._icon
 
-					if icon==None: icon = PLUGIN_ICON
+			entry = widgets.ExtendedMenuItem(self,PLUGIN_MENU_ICON,'Plugins','Create, edit, and install&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.openPlugin)
+			self.toolsMenu.addAction(entry)
 
-					if plugins.paused(obj):
-						entry = QAction(QIcon(icon),f"Edit {NAME} {VERSION} (Paused)",self)
-					else:
-						entry = QAction(QIcon(icon),f"Edit {NAME} {VERSION}",self)
-					if config.ENABLE_PLUGIN_EDITOR:
-						entry.triggered.connect(lambda state,h=filename: self.openPythonEditor(h))
-					else:
-						entry.triggered.connect(lambda state: self.openFile(filename))
-					sm.addAction(entry)
+		self.toolsMenu.addSeparator()
+
+		if config.SHOW_FILE_EDITING_IN_TOOLS:
+
+			if config.SCRIPTING_ENGINE_ENABLED:
+				file_paths = []
+				for root, _, files in os.walk(commands.SCRIPTS_DIRECTORY):
+					for file in files:
+						file_paths.append(os.path.join(root, file))
+				file_paths = list(set(file_paths))
+				if len(file_paths)>0:
+					sm = self.toolsMenu.addMenu(QIcon(SCRIPT_ICON),"Edit installed scripts")
+
+					for f in file_paths:
+						entry = QAction(QIcon(SCRIPT_ICON),f"{os.path.basename(f)}",self)
+						entry.triggered.connect(lambda state,h=f: self.openEditor(h))
+						sm.addAction(entry)
+
+				if len(user.COMMANDS)>0:
+					sm = self.toolsMenu.addMenu(QIcon(CONNECT_ICON),"Edit connection scripts")
+
+					for f in user.COMMANDS:
+						entry = QAction(QIcon(SCRIPT_ICON),f"{f}",self)
+						entry.triggered.connect(lambda state,h=f: self.openEditorConnect(h))
+						sm.addAction(entry)
+
+			if config.ENABLE_PLUGINS:
+				if len(plugins.PLUGINS)>0:
+					sm = self.toolsMenu.addMenu(QIcon(PLUGIN_ICON),"Edit installed plugins")
+					for obj in plugins.PLUGINS:
+						filename = obj._filename
+						basename = obj._basename
+						events = obj._events
+						classname = obj._class
+						NAME = obj.NAME
+						VERSION = obj.VERSION
+						icon = obj._icon
+
+						if icon==None: icon = PYTHON_ICON
+
+						if plugins.paused(obj):
+							entry = QAction(QIcon(icon),f"{NAME} {VERSION} (Paused)",self)
+						else:
+							entry = QAction(QIcon(icon),f"{NAME} {VERSION}",self)
+						if config.ENABLE_PLUGIN_EDITOR:
+							entry.triggered.connect(lambda state,h=filename: self.openPythonEditor(h))
+						else:
+							entry.triggered.connect(lambda state: self.openFile(filename))
+						sm.addAction(entry)
 
 		sm = self.toolsMenu.addMenu(QIcon(FOLDER_ICON),"Directories")
 
@@ -5576,119 +5601,6 @@ class Merk(QMainWindow):
 
 		if len(listOfConnections)>1: self.multiple_servers = True
 
-		if len(listOfConnections)>0:
-
-			for i in listOfConnections:
-				entry = listOfConnections[i]
-				if entry.hostname:
-					name = entry.hostname
-				else:
-					name = entry.server+":"+str(entry.port)
-
-				sw = self.getServerSubWindow(entry)
-				wl = self.getAllSubChatWindows(entry)
-				total = self.getAllSubWindows(entry)
-
-				if len(total)>0:
-					if hasattr(sw,"widget"):
-
-						c = sw.widget()
-						if hasattr(c.client,"network"):
-							mynet = c.client.network
-						else:
-							mynet = config.UNKNOWN_NETWORK_NAME
-
-						sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
-
-						if not c.client.registered: sm.setEnabled(False)
-
-						if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
-							netlink = get_network_link(mynet)
-							if netlink!=None:
-								desc = f"<b><a href=\"{netlink}\">Network Website</a></b>"
-							else:
-								desc = "<b>IRC Network</b>"
-						else:
-							desc = "<b>IRC Network</b>"
-
-						if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
-							entry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
-							sm.addAction(entry)
-
-						if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU and c.client.registered:
-							ssetting = sm.addMenu(c.server_info_menu)
-							ssetting.setIcon(QIcon(NETWORK_ICON))
-
-						sm.addSeparator()
-
-						if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
-							entry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
-							entry.triggered.connect(lambda state: sw.widget().loadScript(True))
-							sm.addAction(entry)
-
-						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
-							hostid = c.client.server+":"+str(c.client.port)
-							entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
-							sm.addAction(entry)
-
-						if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
-							entry.triggered.connect(lambda state: sw.widget().changeNick())
-							sm.addAction(entry)
-
-						if config.SHOW_AWAY_IN_WINDOWS_MENU and c.client.registered:
-							if c.client.is_away:
-								entry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
-							else:
-								entry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
-							entry.triggered.connect(lambda state: sw.widget().changeAway())
-							sm.addAction(entry)
-
-						if config.SHOW_JOIN_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
-							entry.triggered.connect(lambda state: sw.widget().joinChannel())
-							sm.addAction(entry)
-
-						if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(LIST_ICON),"Open channel list",self)
-							entry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
-							sm.addAction(entry)
-
-						if config.SHOW_LOGS_IN_WINDOWS_MENU and c.client.registered and (len(os.listdir(logs.LOG_DIRECTORY))>0):
-							if len(logs.find_network_logs(f"{mynet}"))>0:
-								entry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
-								entry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
-								sm.addAction(entry)
-
-						sm.addSeparator()
-
-						entry = QAction(QIcon(CONSOLE_ICON),name,self)
-						entry.triggered.connect(lambda state,u=sw: self.showSubWindow(u))
-						if not sw.isVisible():
-							f = entry.font()
-							f.setItalic(True)
-							entry.setFont(f)
-						sm.addAction(entry)
-
-						for w in wl:
-							c = w.widget()
-
-							if c.window_type==CHANNEL_WINDOW:
-								icon = CHANNEL_ICON
-							elif c.window_type==PRIVATE_WINDOW:
-								icon = PRIVATE_ICON
-
-							entry = QAction(QIcon(icon),c.name,self)
-							entry.triggered.connect(lambda state,u=w: self.showSubWindow(u))
-							if not w.isVisible():
-								f = entry.font()
-								f.setItalic(True)
-								entry.setFont(f)
-							sm.addAction(entry)
-
-		self.windowsMenu.addSeparator()
-
 		# Show server subwindows first
 		counter = 0
 		for window in self.MDI.subWindowList():
@@ -5810,7 +5722,121 @@ class Merk(QMainWindow):
 				if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+R"))
 				self.windowsMenu.addAction(entry)
 
-		self.windowsMenu.addSeparator()
+		if len(listOfConnections)>0:
+
+			e = textSeparator(self,"active connections")
+			self.windowsMenu.addAction(e)
+
+			for i in listOfConnections:
+				entry = listOfConnections[i]
+				if entry.hostname:
+					name = entry.hostname
+				else:
+					name = entry.server+":"+str(entry.port)
+
+				sw = self.getServerSubWindow(entry)
+				wl = self.getAllSubChatWindows(entry)
+				total = self.getAllSubWindows(entry)
+
+				if len(total)>0:
+					if hasattr(sw,"widget"):
+
+						c = sw.widget()
+						if hasattr(c.client,"network"):
+							mynet = c.client.network
+						else:
+							mynet = config.UNKNOWN_NETWORK_NAME
+
+						sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
+
+						if not c.client.registered: sm.setEnabled(False)
+
+						if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
+							netlink = get_network_link(mynet)
+							if netlink!=None:
+								desc = f"<b><a href=\"{netlink}\">Network Website</a></b>"
+							else:
+								desc = "<b>IRC Network</b>"
+						else:
+							desc = "<b>IRC Network</b>"
+
+						if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
+							entry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
+							sm.addAction(entry)
+
+						if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU and c.client.registered:
+							ssetting = sm.addMenu(c.server_info_menu)
+							ssetting.setIcon(QIcon(NETWORK_ICON))
+
+						sm.addSeparator()
+
+						if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
+							entry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
+							entry.triggered.connect(lambda state: sw.widget().loadScript(True))
+							sm.addAction(entry)
+
+						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
+							hostid = c.client.server+":"+str(c.client.port)
+							entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
+							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
+							sm.addAction(entry)
+
+						if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
+							entry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
+							entry.triggered.connect(lambda state: sw.widget().changeNick())
+							sm.addAction(entry)
+
+						if config.SHOW_AWAY_IN_WINDOWS_MENU and c.client.registered:
+							if c.client.is_away:
+								entry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
+							else:
+								entry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
+							entry.triggered.connect(lambda state: sw.widget().changeAway())
+							sm.addAction(entry)
+
+						if config.SHOW_JOIN_IN_WINDOWS_MENU and c.client.registered:
+							entry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
+							entry.triggered.connect(lambda state: sw.widget().joinChannel())
+							sm.addAction(entry)
+
+						if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU and c.client.registered:
+							entry = QAction(QIcon(LIST_ICON),"Open channel list",self)
+							entry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
+							sm.addAction(entry)
+
+						if config.SHOW_LOGS_IN_WINDOWS_MENU and c.client.registered and (len(os.listdir(logs.LOG_DIRECTORY))>0):
+							if len(logs.find_network_logs(f"{mynet}"))>0:
+								entry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
+								entry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
+								sm.addAction(entry)
+
+						sm.addSeparator()
+
+						entry = QAction(QIcon(CONSOLE_ICON),name,self)
+						entry.triggered.connect(lambda state,u=sw: self.showSubWindow(u))
+						if not sw.isVisible():
+							f = entry.font()
+							f.setItalic(True)
+							entry.setFont(f)
+						sm.addAction(entry)
+
+						for w in wl:
+							c = w.widget()
+
+							if c.window_type==CHANNEL_WINDOW:
+								icon = CHANNEL_ICON
+							elif c.window_type==PRIVATE_WINDOW:
+								icon = PRIVATE_ICON
+
+							entry = QAction(QIcon(icon),c.name,self)
+							entry.triggered.connect(lambda state,u=w: self.showSubWindow(u))
+							if not w.isVisible():
+								f = entry.font()
+								f.setItalic(True)
+								entry.setFont(f)
+							sm.addAction(entry)
+
+			self.windowsMenu.addSeparator()
 
 		entry3 = QAction(QIcon(NEXT_ICON),"Next subwindow",self)
 		entry3.triggered.connect(self.MDI.activateNextSubWindow)
