@@ -490,9 +490,11 @@ DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = True
 MINIMUM_FONT_SIZE = 8
 SHOW_STATUS_IN_USERLIST_MENU = False
 SHOW_FILE_EDITING_IN_TOOLS = True
+SHOW_RESTART_IN_SETTINGS_MENU = False
 
 def build_settings():
 	settings = {
+		"show_restart_in_settings_menu": SHOW_RESTART_IN_SETTINGS_MENU,
 		"edit_files_in_tools_menu": SHOW_FILE_EDITING_IN_TOOLS,
 		"show_status_in_userlist_menus": SHOW_STATUS_IN_USERLIST_MENU,
 		"minimum_application_font_point_size": MINIMUM_FONT_SIZE,
@@ -942,6 +944,8 @@ def build_settings():
 	return settings
 
 def patch_settings(settings):
+	if not "show_restart_in_settings_menu" in settings:
+		settings["show_restart_in_settings_menu"] = SHOW_RESTART_IN_SETTINGS_MENU
 	if not "edit_files_in_tools_menu" in settings:
 		settings["edit_files_in_tools_menu"] = SHOW_FILE_EDITING_IN_TOOLS
 	if not "show_status_in_userlist_menus" in settings:
@@ -2278,6 +2282,7 @@ def load_settings(filename):
 	global MINIMUM_FONT_SIZE
 	global SHOW_STATUS_IN_USERLIST_MENU
 	global SHOW_FILE_EDITING_IN_TOOLS
+	global SHOW_RESTART_IN_SETTINGS_MENU
 
 	if os.path.isfile(filename):
 		with open(filename, "r") as read_settings:
@@ -2287,6 +2292,7 @@ def load_settings(filename):
 		settings = patch_settings(settings)
 		postpatch_length = len(settings)
 
+		SHOW_RESTART_IN_SETTINGS_MENU = settings["show_restart_in_settings_menu"]
 		SHOW_FILE_EDITING_IN_TOOLS = settings["edit_files_in_tools_menu"]
 		SHOW_STATUS_IN_USERLIST_MENU = settings["show_status_in_userlist_menus"]
 		MINIMUM_FONT_SIZE = settings["minimum_application_font_point_size"]

@@ -2711,7 +2711,7 @@ class Dialog(QDialog):
 		misLayout.addWidget(self.enableDnD)
 		misLayout.addWidget(self.managerTop)
 		misLayout.addWidget(self.showTips)
-
+		
 		titleLayout = QVBoxLayout()
 		titleLayout.setSpacing(0)
 		titleLayout.addWidget(self.noAppNameTitle)
@@ -3036,8 +3036,7 @@ class Dialog(QDialog):
 			The <b>menubar</b> is a toolbar widget that takes the place of the menus of a
 			"normal" application. The <b>menubar</b> can be moved to either the <b>top</b>
 			of the main window, the <b>bottom</b> of the main window, or can be optionally
-			<b>movable</b>. The <b>menubar</b> is turned on by default,
-			but can be turned off if normal application menus are desired.
+			<b>movable</b>.
 			</small>
 			""")
 		self.menubarDescription.setWordWrap(True)
@@ -3302,13 +3301,18 @@ class Dialog(QDialog):
 		llMenuLayout.addWidget(self.menubarMenu)
 		llMenuLayout.addWidget(self.showFileEdit)
 
+		self.showRestart = QCheckBox(f"Show restart in the \"{config.MAIN_MENU_SETTINGS_NAME}\" menu",self)
+		if config.SHOW_RESTART_IN_SETTINGS_MENU: self.showRestart.setChecked(True)
+		self.showRestart.stateChanged.connect(self.changedSetting)
+
 		msLayout = QVBoxLayout()
-		msLayout.setSpacing(2)
+		msLayout.setSpacing(0)
 		msLayout.addWidget(self.menubarDescription)
 		msLayout.addLayout(menu1Layout)
 		msLayout.addLayout(menu2Layout)
 		msLayout.addLayout(justifyLayout)
 		msLayout.addLayout(llMenuLayout)
+		msLayout.addWidget(self.showRestart)
 
 		menuLayout = QVBoxLayout()
 		menuLayout.setSpacing(0)
@@ -4909,7 +4913,7 @@ class Dialog(QDialog):
 
 		self.showNetLinks = QCheckBox("Show known links to network homepages",self)
 		if config.SHOW_LINKS_TO_NETWORK_WEBPAGES: self.showNetLinks.setChecked(True)
-		self.showNetLinks.stateChanged.connect(self.changedSetting)
+		self.showNetLinks.stateChanged.connect(self.changedSettingStatusBar)
 		
 		self.fetchFreqLabel = QLabel("Fetch user data every ")
 		self.fetchFreqLabelSpec = QLabel(" seconds")
@@ -7907,6 +7911,7 @@ class Dialog(QDialog):
 		config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = self.statusInfo.isChecked()
 		config.SHOW_STATUS_IN_USERLIST_MENU = self.statusMenus.isChecked()
 		config.SHOW_FILE_EDITING_IN_TOOLS = self.showFileEdit.isChecked()
+		config.SHOW_RESTART_IN_SETTINGS_MENU = self.showRestart.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True

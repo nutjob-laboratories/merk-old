@@ -5286,14 +5286,15 @@ class Merk(QMainWindow):
 			entry.triggered.connect(lambda state,u=f"{s}": self.menuSetWidget(u))
 			sm.addAction(entry)
 
-		# self.settingsMenu.addSeparator()
+		if config.SHOW_RESTART_IN_SETTINGS_MENU:
+			self.settingsMenu.addSeparator()
 
-		# entry = QAction(QIcon(APPLICATION_ICON),f"Restart {APPLICATION_NAME}", self)
-		# entry.triggered.connect(self.settingsRestart)
-		# f = entry.font()
-		# f.setBold(True)
-		# entry.setFont(f)
-		# self.settingsMenu.addAction(entry)
+			entry = QAction(QIcon(APPLICATION_ICON),f"Restart {APPLICATION_NAME}", self)
+			entry.triggered.connect(self.settingsRestart)
+			f = entry.font()
+			f.setBold(True)
+			entry.setFont(f)
+			self.settingsMenu.addAction(entry)
 
 		self.buildSystrayMenu()
 
@@ -5611,11 +5612,20 @@ class Merk(QMainWindow):
 						target = f"{c.name}"
 					entry = QAction(QIcon(CONSOLE_ICON),target,self)
 					entry.triggered.connect(lambda state,u=window: self.showSubWindow(u))
+					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+					
+					# Mark hidden windows
 					if not window.isVisible():
 						f = entry.font()
 						f.setItalic(True)
 						entry.setFont(f)
-					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+
+					# Mark active window
+					if window==self.MDI.activeSubWindow():
+						f = entry.font()
+						f.setBold(True)
+						entry.setFont(f)
+
 					irc_windows[window] = entry
 					self.windowsMenu.addAction(entry)
 
@@ -5643,11 +5653,20 @@ class Merk(QMainWindow):
 					else:
 						entry = QAction(QIcon(icon),f"{c.name}",self)
 					entry.triggered.connect(lambda state,u=window: self.showSubWindow(u))
+					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+					
+					# Mark hidden windows
 					if not window.isVisible():
 						f = entry.font()
 						f.setItalic(True)
 						entry.setFont(f)
-					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+
+					# Mark active window
+					if window==self.MDI.activeSubWindow():
+						f = entry.font()
+						f.setBold(True)
+						entry.setFont(f)
+
 					irc_windows[window] = entry
 					self.windowsMenu.addAction(entry)
 
@@ -5669,11 +5688,21 @@ class Merk(QMainWindow):
 					title = f"Channel list for {target}"
 					entry = QAction(QIcon(LIST_ICON),title,self)
 					entry.triggered.connect(lambda state,u=window: self.showSubWindow(u))
+					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Ctrl+Alt+{counter}"))
+					
+					# Mark hidden windows
 					if not window.isVisible():
 						f = entry.font()
 						f.setItalic(True)
 						entry.setFont(f)
-					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Ctrl+Alt+{counter}"))
+
+					# Mark active window
+					if window==self.MDI.activeSubWindow():
+						f = entry.font()
+						f.setBold(True)
+						entry.setFont(f)
+
+					irc_windows[window] = entry
 					self.windowsMenu.addAction(entry)
 
 		# List all editor subwindows
@@ -5690,6 +5719,19 @@ class Merk(QMainWindow):
 				entry = QAction(QIcon(icon),c.name,self)
 				entry.triggered.connect(lambda state,u=win: self.showSubWindow(u))
 				if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Shift+Alt+{counter}"))
+
+				# Mark hidden windows
+				if not win.isVisible():
+					f = entry.font()
+					f.setItalic(True)
+					entry.setFont(f)
+
+				# Mark active window
+				if win==self.MDI.activeSubWindow():
+					f = entry.font()
+					f.setBold(True)
+					entry.setFont(f)
+
 				self.windowsMenu.addAction(entry)
 
 		# The log manager, if it's open
@@ -5702,6 +5744,19 @@ class Merk(QMainWindow):
 					entry = QAction(QIcon(LOG_ICON),"Logs",self)
 				entry.triggered.connect(lambda state,u=self.log_manager: self.showSubWindow(u))
 				if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+L"))
+
+				# Mark hidden windows
+				if not self.log_manager.isVisible():
+					f = entry.font()
+					f.setItalic(True)
+					entry.setFont(f)
+
+				# Mark active window
+				if self.log_manager==self.MDI.activeSubWindow():
+					f = entry.font()
+					f.setBold(True)
+					entry.setFont(f)
+
 				self.windowsMenu.addAction(entry)
 
 		# The README subwindow, if it's open
@@ -5711,6 +5766,19 @@ class Merk(QMainWindow):
 				entry = QAction(QIcon(README_ICON),c.name,self)
 				entry.triggered.connect(lambda state,u=self.readme_window: self.showSubWindow(u))
 				if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+R"))
+
+				# Mark hidden windows
+				if not self.readme_window.isVisible():
+					f = entry.font()
+					f.setItalic(True)
+					entry.setFont(f)
+
+				# Mark active window
+				if self.readme_window==self.MDI.activeSubWindow():
+					f = entry.font()
+					f.setBold(True)
+					entry.setFont(f)
+
 				self.windowsMenu.addAction(entry)
 
 		if len(listOfConnections)>0:
@@ -5728,15 +5796,15 @@ class Merk(QMainWindow):
 				self.windowsMenu.addAction(e)
 
 				for i in listOfConnections:
-					entry = listOfConnections[i]
-					if entry.hostname:
-						name = entry.hostname
+					sentry = listOfConnections[i]
+					if sentry.hostname:
+						name = sentry.hostname
 					else:
-						name = entry.server+":"+str(entry.port)
+						name = sentry.server+":"+str(sentry.port)
 
-					sw = self.getServerSubWindow(entry)
-					wl = self.getAllSubChatWindows(entry)
-					total = self.getAllSubWindows(entry)
+					sw = self.getServerSubWindow(sentry)
+					wl = self.getAllSubChatWindows(sentry)
+					total = self.getAllSubWindows(sentry)
 
 					if len(total)>0:
 						if hasattr(sw,"widget"):
@@ -5754,7 +5822,7 @@ class Merk(QMainWindow):
 							if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
 								netlink = get_network_link(mynet)
 								if netlink!=None:
-									desc = f"<b><a href=\"{netlink}\">Network Website</a></b>"
+									desc = f"<b><a href=\"{netlink}\">Visit network website</a></b>"
 								else:
 									desc = "<b>IRC Network</b>"
 							else:
@@ -5764,16 +5832,16 @@ class Merk(QMainWindow):
 								wentry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
 								sm.addAction(wentry)
 
-							if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU and c.client.registered:
-								ssetting = sm.addMenu(c.server_info_menu)
-								ssetting.setIcon(QIcon(NETWORK_ICON))
-
-							sm.addSeparator()
-
-							if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
-								wentry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
-								wentry.triggered.connect(lambda state: sw.widget().loadScript(True))
+							if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU:
+								wentry = QAction(QIcon(LIST_ICON),"Search channel list",self)
+								wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
 								sm.addAction(wentry)
+
+							if config.SHOW_LOGS_IN_WINDOWS_MENU and (len(os.listdir(logs.LOG_DIRECTORY))>0):
+								if len(logs.find_network_logs(f"{mynet}"))>0:
+									wentry = QAction(QIcon(LOG_ICON),f"View logs for {mynet}",self)
+									wentry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
+									sm.addAction(wentry)
 
 							if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
 								hostid = c.client.server+":"+str(c.client.port)
@@ -5781,69 +5849,33 @@ class Merk(QMainWindow):
 								wentry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
 								sm.addAction(wentry)
 
-							if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
-								wentry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
-								wentry.triggered.connect(lambda state: sw.widget().changeNick())
-								sm.addAction(wentry)
+							if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU:
+								ssetting = sm.addMenu(c.server_info_menu)
+								ssetting.setIcon(QIcon(SETTINGS_ICON))
 
-							if config.SHOW_AWAY_IN_WINDOWS_MENU and c.client.registered:
-								if c.client.is_away:
-									wentry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
-								else:
-									wentry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
-								wentry.triggered.connect(lambda state: sw.widget().changeAway())
-								sm.addAction(wentry)
+							e = textSeparator(self,"subwindows")
+							sm.addAction(e)
 
-							if config.SHOW_JOIN_IN_WINDOWS_MENU and c.client.registered:
-								wentry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
-								wentry.triggered.connect(lambda state: sw.widget().joinChannel())
-								sm.addAction(wentry)
-
-							if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU and c.client.registered:
-								wentry = QAction(QIcon(LIST_ICON),"Open channel list",self)
-								wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
-								sm.addAction(wentry)
-
-							if config.SHOW_LOGS_IN_WINDOWS_MENU and c.client.registered and (len(os.listdir(logs.LOG_DIRECTORY))>0):
-								if len(logs.find_network_logs(f"{mynet}"))>0:
-									wentry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
-									wentry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
-									sm.addAction(wentry)
-
-							sm.addSeparator()
-
-							# wentry = QAction(QIcon(CONSOLE_ICON),name,self)
-							# wentry.triggered.connect(lambda state,u=sw: self.showSubWindow(u))
-							# if not sw.isVisible():
-							# 	f = wentry.font()
-							# 	f.setItalic(True)
-							# 	wentry.setFont(f)
-							# sm.addAction(wentry)
-
+							# Server subwindow
 							for w in irc_windows:
 								if w==sw:
 									sm.addAction(irc_windows[w])
 
+							# Channel and private chat subwindows
 							for w in wl:
 								c = w.widget()
 
-								if c.window_type==CHANNEL_WINDOW:
-									icon = CHANNEL_ICON
-								elif c.window_type==PRIVATE_WINDOW:
-									icon = PRIVATE_ICON
+								for chat in irc_windows:
+									if chat==w:
+										sm.addAction(irc_windows[chat])
 
-								# wentry = QAction(QIcon(icon),c.name,self)
-								# wentry.triggered.connect(lambda state,u=w: self.showSubWindow(u))
-								# if not w.isVisible():
-								# 	f = wentry.font()
-								# 	f.setItalic(True)
-								# 	wentry.setFont(f)
-								# sm.addAction(wentry)
-								for c in irc_windows:
-									if c==w:
-										sm.addAction(irc_windows[c])
+							# Channel list window for the server
+							for c in irc_windows:
+								w = c.widget()
+								if w.window_type==LIST_WINDOW and w.client==sw.widget().client:
+									sm.addAction(irc_windows[c])
 
-			self.windowsMenu.addSeparator()
+		self.windowsMenu.addSeparator()
 
 		entry3 = QAction(QIcon(NEXT_ICON),"Next subwindow",self)
 		entry3.triggered.connect(self.MDI.activateNextSubWindow)
@@ -5909,7 +5941,7 @@ class Merk(QMainWindow):
 				self.mainMenu.addAction(entry)
 			else:
 				title = "Disconnect from all servers"
-				entry = widgets.ExtendedMenuItem(self,DISCONNECT_MENU_ICON,"Disconnect","Disconnect from all servers",CUSTOM_MENU_ICON_SIZE,self.disconnectAllMainMenu)
+				entry = widgets.ExtendedMenuItem(self,DISCONNECT_MENU_ICON,"Disconnect",title,CUSTOM_MENU_ICON_SIZE,self.disconnectAllMainMenu)
 				self.mainMenu.addAction(entry)
 
 				self.mainMenu.addSeparator()
@@ -6464,6 +6496,8 @@ class Merk(QMainWindow):
 	def merk_subWindowActivated(self,subwindow):
 
 		if subwindow==None: return
+
+		self.buildWindowsMenu()
 
 		w = subwindow.widget()
 

@@ -257,6 +257,8 @@ def get_icon_windowbar_button(icon,name):
 			)
 
 	toolMenuButton.setStyleSheet(toolbar_button_style)
+
+	toolMenuButton.setFocusPolicy(Qt.NoFocus)
 	
 	return toolMenuButton
 
@@ -269,6 +271,8 @@ def get_windowbar_button(name):
 			)
 
 	toolMenuButton.setStyleSheet(toolbar_button_style)
+
+	toolMenuButton.setFocusPolicy(Qt.NoFocus)
 	
 	return toolMenuButton
 
@@ -340,8 +344,8 @@ class wMenuButton(QPushButton):
 				menu.addAction(self.contextRefresh)
 
 			if config.SCRIPTING_ENGINE_ENABLED:
-				self.contextRun = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
-				self.contextRun.triggered.connect(lambda state: self.window.loadScript(True))
+				self.contextRun = QAction(QIcon(RUN_ICON),"Run a script on this window",self)
+				self.contextRun.triggered.connect(self.window.scriptDialog)
 				menu.addAction(self.contextRun)
 
 			menu.addSeparator()
@@ -406,6 +410,11 @@ class wMenuButton(QPushButton):
 
 		if self.window.window_type==CHANNEL_WINDOW:
 
+			if config.SCRIPTING_ENGINE_ENABLED:
+				entry = QAction(QIcon(RUN_ICON),"Run a script on this window",self)
+				entry.triggered.connect(self.window.scriptDialog)
+				menu.addAction(entry)
+
 			menu.addSeparator()
 
 			if config.ENABLE_STYLE_EDITOR:
@@ -449,6 +458,11 @@ class wMenuButton(QPushButton):
 			menu.addAction(entry)
 
 		if self.window.window_type!=CHANNEL_WINDOW and self.window.window_type!=SERVER_WINDOW:
+
+			if config.SCRIPTING_ENGINE_ENABLED and hasattr(self.window,"scriptDialog"):
+				entry = QAction(QIcon(RUN_ICON),"Run a script on this window",self)
+				entry.triggered.connect(self.window.scriptDialog)
+				menu.addAction(entry)
 
 			menu.addSeparator()
 

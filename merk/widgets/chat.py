@@ -4340,7 +4340,7 @@ def buildServerSettingsMenu(self,client):
 	maxmodes = client.maxmodes
 	ircv3 = client.ircv3
 
-	optionsMenu = QMenu("Server information")
+	optionsMenu = QMenu("Server configuration")
 
 	if client.hostname:
 		name = client.hostname
@@ -4380,8 +4380,14 @@ def buildServerSettingsMenu(self,client):
 		e = plainTextAction(self,"<b>Connection</b>: TCP/IP")
 	optionsMenu.addAction(e)
 
-	e = plainTextAction(self,"<b>Network"+f"</b>: {mynet}")
-	optionsMenu.addAction(e)
+	if mynet.lower()!= config.UNKNOWN_NETWORK_NAME.lower():
+		e = plainTextAction(self,"<b>Network"+f"</b>: {mynet}")
+		optionsMenu.addAction(e)
+
+		netlink = get_network_link(mynet)
+		if netlink!=None:
+			e = plainTextAction(self,"<b>Website"+f"</b>: <a href=\"{netlink}\">{netlink}</a>")
+			optionsMenu.addAction(e)
 
 	if client.server_software:
 		e = plainTextAction(self,"<b>Software"+f"</b>: {client.server_software}")
@@ -4415,7 +4421,7 @@ def buildServerSettingsMenu(self,client):
 			e = plainTextAction(self,"<b>Channels"+f"</b>: {client.server_channel_count:,} ({diff:,} hidden)")
 		optionsMenu.addAction(e)
 
-	e = textSeparator(self,"Configuration")
+	e = textSeparator(self,"settings")
 	optionsMenu.addAction(e)
 
 	e = plainTextAction(self,"Maximum channels"+f": <b>{maxchannels}</b>")

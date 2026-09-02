@@ -707,8 +707,6 @@ def markdown_to_irc(text):
 	mapping = {"***": "\x02\x1D", "**": "\x02", "*": "\x1D", "__": "\x1F", "~": "\x1E"}
 	tags = ["***", "**", "__", "*", "~"]
 	output, active_stack, i = [], [], 0
-
-	if type(text)!=type(''): return ''
 	
 	while i < len(text):
 		if text[i] == '\\' and i + 1 < len(text) and text[i+1] in '*_~':

@@ -90,6 +90,8 @@ class Dialog(QDialog):
 		for f in commands.list_scripts():
 			scripts.append(f'{f}')
 
+		scripts = sorted(scripts, key=str.casefold)
+
 		self.name = QComboBox(self)
 		self.name.currentTextChanged.connect(self.on_script_changed)
 		fm = QFontMetrics(self.font())
@@ -98,6 +100,7 @@ class Dialog(QDialog):
 		self.name.addItem('')
 		for e in scripts:
 			self.name.addItem(e)
+		self.name.setEditable(True)
 
 		self.file_button = QPushButton("")
 		self.file_button.setIcon(QIcon(OPENFILE_ICON))
