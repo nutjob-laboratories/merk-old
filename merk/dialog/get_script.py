@@ -100,9 +100,10 @@ class Dialog(QDialog):
 			self.name.addItem(e)
 
 		self.file_button = QPushButton("")
-		self.file_button.setIcon(QIcon(EDIT_ICON))
+		self.file_button.setIcon(QIcon(OPENFILE_ICON))
 		self.file_button.clicked.connect(self.getFilename)
 		self.file_button.setToolTip("Select a script")
+		self.file_button.setFlat(True)
 
 		nameLayout.addWidget(self.nameLabel)
 		nameLayout.addWidget(self.name)
@@ -122,6 +123,7 @@ class Dialog(QDialog):
 		# Buttons
 		buttons = QDialogButtonBox(self)
 		buttons.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+		buttons.button(QDialogButtonBox.Ok).setText("Execute script")
 		buttons.accepted.connect(self.accept)
 		buttons.rejected.connect(self.reject)
 

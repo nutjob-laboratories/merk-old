@@ -85,6 +85,18 @@ What's new:
 * Bugfix: the "Servers" option for autocomplete on the "Input" section of the
   "Settings" dialog would be disabled even if "autocomplete" was enabled if
   had ever been disabled.
+* The "active connections" section of the "Windows" menu will only be shown if
+  there is at least one REGISTERED connection to a server; after that, server
+  submenus for unregistered connections will be shown, but disabled.
+* Bugfix: disabling scripting could cause the connection dialog to crash the
+  application.
+* The "Run a script" entry in subwindow right click menus now launches a dialog
+  to get the script filename and any arguments to pass to the script, rather
+  than just getting a filename and executing it. This is the same dialog that
+  appears if "/script" is ran without any arguments.
+* Bugfix: disconnecting from a server could sometimes crash the client.
+* Shortcuts for subwindows are now shown every place that subwindow appears in
+  the "Windows" menu.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

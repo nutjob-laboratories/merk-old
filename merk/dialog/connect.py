@@ -163,15 +163,16 @@ class Dialog(QDialog):
 				user.LAST_RECONNECT = self.RECONNECT_OPTION
 				user.HISTORY = user_history
 
-				commands = self.commands.toPlainText()
-				if hostid in user.COMMANDS:
-					if len(commands.strip())==0:
-						del user.COMMANDS[hostid]
+				if config.SCRIPTING_ENGINE_ENABLED:
+					commands = self.commands.toPlainText()
+					if hostid in user.COMMANDS:
+						if len(commands.strip())==0:
+							del user.COMMANDS[hostid]
+						else:
+							user.COMMANDS[hostid] = self.commands.toPlainText()
 					else:
-						user.COMMANDS[hostid] = self.commands.toPlainText()
-				else:
-					if len(commands.strip())>0:
-						user.COMMANDS[hostid] = self.commands.toPlainText()
+						if len(commands.strip())>0:
+							user.COMMANDS[hostid] = self.commands.toPlainText()
 
 				if sasl_username!=None and sasl_password!=None:
 					sentry = [sasl_username,sasl_password]
@@ -206,7 +207,7 @@ class Dialog(QDialog):
 				return retval
 			else:
 
-				connection_script.add_connection_script(hostid,self.commands.toPlainText())
+				if config.SCRIPTING_ENGINE_ENABLED: connection_script.add_connection_script(hostid,self.commands.toPlainText())
 
 				if len(self.password.text().strip())==0:
 					server_pass = None
@@ -272,7 +273,6 @@ class Dialog(QDialog):
 		self.SASL_Password = None
 		self.use_SASL = False
 		self.sasl.setCheckState(Qt.Unchecked)
-
 
 		hostid = f"{host}:{h[1]}"
 		if hostid in user.SASL and config.ALWAYS_USE_SASL_LOGINS:
@@ -448,18 +448,18 @@ class Dialog(QDialog):
 		if self.check_info()==False:
 			self.ok_button.setEnabled(False)
 			self.sasl.setEnabled(False)
-			self.commands_tab.setEnabled(False)
 			self.profile.setEnabled(False)
-			if len(host.strip())==0 or len(port.strip())==0:
-				self.commandHost.setText("<center><small><b>No server selected</b></small></center>")
-				self.commands.clear()
+			if config.SCRIPTING_ENGINE_ENABLED:
+				if len(host.strip())==0 or len(port.strip())==0:
+					self.commandHost.setText("<center><small><b>No server selected</b></small></center>")
+					self.commands.clear()
 		else:
 			self.ok_button.setEnabled(True)
 			self.sasl.setEnabled(True)
-			self.commands_tab.setEnabled(True)
+			if config.SCRIPTING_ENGINE_ENABLED and hasattr(self,"commands_tab"):
+				self.commandHost.setText(self.exeTemplate.replace('%__SERVER__%',hostid))
 			self.profile.setEnabled(True)
-			self.commandHost.setText(self.exeTemplate.replace('%__SERVER__%',hostid))
-
+			
 			if hostid in user.COMMANDS:
 				self.commands.setPlainText(user.COMMANDS[hostid])
 			else:
@@ -1028,6 +1028,8 @@ class Dialog(QDialog):
 			self.StoredData.append(s[1])
 
 		self.StoredServer = self.servers.currentIndex()
+
+		self.servers.setToolTip(f"{self.servers.count()-1} servers available")
 
 def get_network_list():
 	servlist = []

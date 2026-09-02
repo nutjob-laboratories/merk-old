@@ -5569,6 +5569,8 @@ class Merk(QMainWindow):
 
 		self.multiple_servers = False
 
+		irc_windows = {}
+
 		# List all server connections
 		listOfConnections = {}
 		for i in irc.CONNECTIONS:
@@ -5614,6 +5616,7 @@ class Merk(QMainWindow):
 						f.setItalic(True)
 						entry.setFont(f)
 					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+					irc_windows[window] = entry
 					self.windowsMenu.addAction(entry)
 
 		# Step through IRC subwindows
@@ -5645,6 +5648,7 @@ class Merk(QMainWindow):
 						f.setItalic(True)
 						entry.setFont(f)
 					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
+					irc_windows[window] = entry
 					self.windowsMenu.addAction(entry)
 
 		# Step through channel list windows
@@ -5711,117 +5715,133 @@ class Merk(QMainWindow):
 
 		if len(listOfConnections)>0:
 
-			e = textSeparator(self,"active connections")
-			self.windowsMenu.addAction(e)
-
+			add_menus = False
 			for i in listOfConnections:
-				entry = listOfConnections[i]
-				if entry.hostname:
-					name = entry.hostname
-				else:
-					name = entry.server+":"+str(entry.port)
+				if listOfConnections[i].registered: add_menus = True
 
-				sw = self.getServerSubWindow(entry)
-				wl = self.getAllSubChatWindows(entry)
-				total = self.getAllSubWindows(entry)
+			# Don't add any server submenus (even if they're disabled)
+			# until at least ONE of the connections has registered
+			# with the server; unregistered connections will still
+			# have their submenu disabled
+			if add_menus:
+				e = textSeparator(self,"active connections")
+				self.windowsMenu.addAction(e)
 
-				if len(total)>0:
-					if hasattr(sw,"widget"):
+				for i in listOfConnections:
+					entry = listOfConnections[i]
+					if entry.hostname:
+						name = entry.hostname
+					else:
+						name = entry.server+":"+str(entry.port)
 
-						c = sw.widget()
-						if hasattr(c.client,"network"):
-							mynet = c.client.network
-						else:
-							mynet = config.UNKNOWN_NETWORK_NAME
+					sw = self.getServerSubWindow(entry)
+					wl = self.getAllSubChatWindows(entry)
+					total = self.getAllSubWindows(entry)
 
-						sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
+					if len(total)>0:
+						if hasattr(sw,"widget"):
 
-						if not c.client.registered: sm.setEnabled(False)
+							c = sw.widget()
+							if hasattr(c.client,"network"):
+								mynet = c.client.network
+							else:
+								mynet = config.UNKNOWN_NETWORK_NAME
 
-						if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
-							netlink = get_network_link(mynet)
-							if netlink!=None:
-								desc = f"<b><a href=\"{netlink}\">Network Website</a></b>"
+							sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
+
+							if not c.client.registered: sm.setEnabled(False)
+
+							if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
+								netlink = get_network_link(mynet)
+								if netlink!=None:
+									desc = f"<b><a href=\"{netlink}\">Network Website</a></b>"
+								else:
+									desc = "<b>IRC Network</b>"
 							else:
 								desc = "<b>IRC Network</b>"
-						else:
-							desc = "<b>IRC Network</b>"
 
-						if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
-							entry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
-							sm.addAction(entry)
+							if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
+								wentry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
+								sm.addAction(wentry)
 
-						if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU and c.client.registered:
-							ssetting = sm.addMenu(c.server_info_menu)
-							ssetting.setIcon(QIcon(NETWORK_ICON))
+							if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU and c.client.registered:
+								ssetting = sm.addMenu(c.server_info_menu)
+								ssetting.setIcon(QIcon(NETWORK_ICON))
 
-						sm.addSeparator()
+							sm.addSeparator()
 
-						if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
-							entry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
-							entry.triggered.connect(lambda state: sw.widget().loadScript(True))
-							sm.addAction(entry)
+							if config.SCRIPTING_ENGINE_ENABLED and c.client.registered:
+								wentry = QAction(QIcon(RUN_ICON),"Run a script on server window",self)
+								wentry.triggered.connect(lambda state: sw.widget().loadScript(True))
+								sm.addAction(wentry)
 
-						if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
-							hostid = c.client.server+":"+str(c.client.port)
-							entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-							entry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
-							sm.addAction(entry)
+							if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
+								hostid = c.client.server+":"+str(c.client.port)
+								wentry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
+								wentry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
+								sm.addAction(wentry)
 
-						if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
-							entry.triggered.connect(lambda state: sw.widget().changeNick())
-							sm.addAction(entry)
+							if config.SHOW_NICK_IN_WINDOWS_MENU and c.client.registered:
+								wentry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
+								wentry.triggered.connect(lambda state: sw.widget().changeNick())
+								sm.addAction(wentry)
 
-						if config.SHOW_AWAY_IN_WINDOWS_MENU and c.client.registered:
-							if c.client.is_away:
-								entry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
-							else:
-								entry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
-							entry.triggered.connect(lambda state: sw.widget().changeAway())
-							sm.addAction(entry)
+							if config.SHOW_AWAY_IN_WINDOWS_MENU and c.client.registered:
+								if c.client.is_away:
+									wentry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
+								else:
+									wentry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
+								wentry.triggered.connect(lambda state: sw.widget().changeAway())
+								sm.addAction(wentry)
 
-						if config.SHOW_JOIN_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
-							entry.triggered.connect(lambda state: sw.widget().joinChannel())
-							sm.addAction(entry)
+							if config.SHOW_JOIN_IN_WINDOWS_MENU and c.client.registered:
+								wentry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
+								wentry.triggered.connect(lambda state: sw.widget().joinChannel())
+								sm.addAction(wentry)
 
-						if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU and c.client.registered:
-							entry = QAction(QIcon(LIST_ICON),"Open channel list",self)
-							entry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
-							sm.addAction(entry)
+							if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU and c.client.registered:
+								wentry = QAction(QIcon(LIST_ICON),"Open channel list",self)
+								wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
+								sm.addAction(wentry)
 
-						if config.SHOW_LOGS_IN_WINDOWS_MENU and c.client.registered and (len(os.listdir(logs.LOG_DIRECTORY))>0):
-							if len(logs.find_network_logs(f"{mynet}"))>0:
-								entry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
-								entry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
-								sm.addAction(entry)
+							if config.SHOW_LOGS_IN_WINDOWS_MENU and c.client.registered and (len(os.listdir(logs.LOG_DIRECTORY))>0):
+								if len(logs.find_network_logs(f"{mynet}"))>0:
+									wentry = QAction(QIcon(LOG_ICON),f"Logs for {mynet}",self)
+									wentry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
+									sm.addAction(wentry)
 
-						sm.addSeparator()
+							sm.addSeparator()
 
-						entry = QAction(QIcon(CONSOLE_ICON),name,self)
-						entry.triggered.connect(lambda state,u=sw: self.showSubWindow(u))
-						if not sw.isVisible():
-							f = entry.font()
-							f.setItalic(True)
-							entry.setFont(f)
-						sm.addAction(entry)
+							# wentry = QAction(QIcon(CONSOLE_ICON),name,self)
+							# wentry.triggered.connect(lambda state,u=sw: self.showSubWindow(u))
+							# if not sw.isVisible():
+							# 	f = wentry.font()
+							# 	f.setItalic(True)
+							# 	wentry.setFont(f)
+							# sm.addAction(wentry)
 
-						for w in wl:
-							c = w.widget()
+							for w in irc_windows:
+								if w==sw:
+									sm.addAction(irc_windows[w])
 
-							if c.window_type==CHANNEL_WINDOW:
-								icon = CHANNEL_ICON
-							elif c.window_type==PRIVATE_WINDOW:
-								icon = PRIVATE_ICON
+							for w in wl:
+								c = w.widget()
 
-							entry = QAction(QIcon(icon),c.name,self)
-							entry.triggered.connect(lambda state,u=w: self.showSubWindow(u))
-							if not w.isVisible():
-								f = entry.font()
-								f.setItalic(True)
-								entry.setFont(f)
-							sm.addAction(entry)
+								if c.window_type==CHANNEL_WINDOW:
+									icon = CHANNEL_ICON
+								elif c.window_type==PRIVATE_WINDOW:
+									icon = PRIVATE_ICON
+
+								# wentry = QAction(QIcon(icon),c.name,self)
+								# wentry.triggered.connect(lambda state,u=w: self.showSubWindow(u))
+								# if not w.isVisible():
+								# 	f = wentry.font()
+								# 	f.setItalic(True)
+								# 	wentry.setFont(f)
+								# sm.addAction(wentry)
+								for c in irc_windows:
+									if c==w:
+										sm.addAction(irc_windows[c])
 
 			self.windowsMenu.addSeparator()
 

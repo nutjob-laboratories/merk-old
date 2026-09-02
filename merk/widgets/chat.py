@@ -35,6 +35,7 @@ import pathlib
 import random
 from datetime import datetime, timezone
 import html
+import shlex
 
 import emoji
 
@@ -1266,7 +1267,7 @@ class Window(QMainWindow):
 					act.triggered.connect(lambda : self.menuPasteClipboard(b[0]))
 					uMenu.addAction(act)
 
-					act = QAction(QIcon(SHOW_ICON),f"Unban {b[0]}", self)
+					act = QAction(QIcon(SHOW_ICON),f"Unban {b[0]} from {self.name}", self)
 					act.triggered.connect(lambda : self.unbanUser(b[0],opmenu))
 					f = act.font()
 					f.setBold(True)
@@ -1279,7 +1280,7 @@ class Window(QMainWindow):
 				act.triggered.connect(lambda : self.menuPasteClipboard("\n".join(bl)))
 				banMenu.addAction(act)
 				
-				act = QAction(QIcon(SHOW_ICON),f"Unban all users", self)
+				act = QAction(QIcon(SHOW_ICON),f"Unban all users from {self.name}", self)
 				act.triggered.connect(lambda : self.unbanAll(bl))
 				f = act.font()
 				f.setBold(True)
@@ -1319,7 +1320,7 @@ class Window(QMainWindow):
 		msgBox = QMessageBox()
 		msgBox.setIconPixmap(QPixmap(SHOW_ICON))
 		msgBox.setWindowIcon(QIcon(APPLICATION_ICON))
-		msgBox.setText(f"Unban <b>{user}/b> from <b>{self.name}</b>?")
+		msgBox.setText(f"Unban <b>{user}</b> from <b>{self.name}</b>?")
 		msgBox.setWindowTitle("Unban User")
 		
 		default_button = msgBox.addButton(" Unban user ", QMessageBox.AcceptRole)
@@ -1410,7 +1411,7 @@ class Window(QMainWindow):
 
 				if config.SCRIPTING_ENGINE_ENABLED:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
-					entry.triggered.connect(lambda state: self.loadScript(True))
+					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
 
 					if not self.client.registered: entry.setEnabled(False)
@@ -1762,7 +1763,7 @@ class Window(QMainWindow):
 
 				if config.SCRIPTING_ENGINE_ENABLED:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
-					entry.triggered.connect(lambda state: self.loadScript(True))
+					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
 
 				if config.EXECUTE_CHANNEL_SCRIPTS and config.SCRIPTING_ENGINE_ENABLED:
@@ -1799,7 +1800,7 @@ class Window(QMainWindow):
 
 				if config.SCRIPTING_ENGINE_ENABLED:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
-					entry.triggered.connect(lambda state: self.loadScript(True))
+					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
 
 				if config.ENABLE_STYLE_EDITOR:
@@ -1822,6 +1823,34 @@ class Window(QMainWindow):
 				menu.addAction(entry)
 
 		action = menu.exec_(self.chat.mapToGlobal(location))
+
+	def scriptDialog(self):
+		x = dialog.GetScript(self.parent)
+		e = x.get_script_information(self.parent)
+		if e:
+			script = e[0]
+			pretoken = e[1]
+			if "'" in pretoken: pretoken = pretoken.replace("'","\\'")
+			args = shlex.split(pretoken, comments=False)
+
+			# Check to see if the filename is a filename
+			# in the application's "path"
+			ffile = commands.find_script(script,SCRIPT_FILE_EXTENSION)
+			if ffile:
+				f=open(ffile, "r",encoding="utf-8",errors="ignore")
+				text = f.read()
+				f.close()
+
+				commands.executeScript(self.parent,self,text,ffile,args)
+			else:
+				# If the filename isn't on the "path", we check
+				# to see if the filename actually exists
+				if Path(script).exists():
+					f=open(script, "r",encoding="utf-8",errors="ignore")
+					text = f.read()
+					f.close()
+
+					commands.executeScript(self.parent,self,text,script,args)
 
 	def toggleFilter(self,cfilters):
 		channel_name = self.encodeChannel()
@@ -2954,15 +2983,15 @@ class Window(QMainWindow):
 
 			opMenu.addSeparator()
 
-			act = QAction(QIcon(KICK_ICON),f"Kick {user_nick}", self)
+			act = QAction(QIcon(KICK_ICON),f"Kick \"{user_nick}\"", self)
 			act.triggered.connect(lambda : self.client.kick(self.name,user_nick))
 			opMenu.addAction(act)
 
-			act = QAction(QIcon(BAN_ICON),f"Ban {user_nick}", self)
+			act = QAction(QIcon(BAN_ICON),f"Ban \"{user_nick}\"", self)
 			act.triggered.connect(lambda : self.menuBanUser(user_nick,user_hostmask))
 			opMenu.addAction(act)
 
-			act = QAction(QIcon(CLOSE_ICON),f"Kick && Ban {user_nick}", self)
+			act = QAction(QIcon(CLOSE_ICON),f"Kick && Ban \"{user_nick}\"", self)
 			act.triggered.connect(lambda : self.menuKickBackUser(user_nick,user_hostmask))
 			opMenu.addAction(act)
 
@@ -3558,6 +3587,9 @@ class Window(QMainWindow):
 				self.name_spacer.hide()
 
 	def disconnect(self,custom_message=None):
+
+		if custom_message!=None:
+			if type(custom_message)!= type(''): custom_message = None
 
 		no_hostname = False
 		if not hasattr(self.client,"hostname"): no_hostname = True
