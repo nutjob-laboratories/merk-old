@@ -193,7 +193,7 @@ class Window(QMainWindow):
 			# first time, so let's execute any
 			# channel script that exists
 			if self.window_type==CHANNEL_WINDOW:
-				if config.EXECUTE_CHANNEL_SCRIPTS and config.SCRIPTING_ENGINE_ENABLED:
+				if config.EXECUTE_CHANNEL_SCRIPTS and config.ENABLE_SCRIPTING_ENGINE:
 					cscript = commands.find_script(self.encodeScriptFilename(),None)
 					if cscript!=None:
 						f = open(cscript,"r")
@@ -395,7 +395,7 @@ class Window(QMainWindow):
 			self.script_button.setFlat(True)
 			serverBar.addWidget(self.script_button)
 
-			if not config.SCRIPTING_ENGINE_ENABLED:
+			if not config.ENABLE_SCRIPTING_ENGINE:
 				self.script_button.hide()
 
 			self.refresh_button = QPushButton("")
@@ -1409,14 +1409,14 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
 					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
 
 					if not self.client.registered: entry.setEnabled(False)
 
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					hostid = self.client.server+":"+str(self.client.port)
 					if hostid in user.COMMANDS:
 						entry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",menu)
@@ -1761,12 +1761,12 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
 					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
 
-				if config.EXECUTE_CHANNEL_SCRIPTS and config.SCRIPTING_ENGINE_ENABLED:
+				if config.EXECUTE_CHANNEL_SCRIPTS and config.ENABLE_SCRIPTING_ENGINE:
 					cscript = commands.find_script(self.encodeScriptFilename(),None)
 					if cscript!=None:
 						entry = QAction(QIcon(SCRIPT_ICON),"Edit channel script",menu)
@@ -1798,7 +1798,7 @@ class Window(QMainWindow):
 
 				menu.addSeparator()
 
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					entry = QAction(QIcon(RUN_ICON),"Run a script on this window",menu)
 					entry.triggered.connect(self.scriptDialog)
 					menu.addAction(entry)
@@ -1933,7 +1933,7 @@ class Window(QMainWindow):
 		self.buildInputOptionsMenu()
 
 	def testForInputMenu(self):
-		if not config.ENABLE_MARKDOWN_MARKUP and not config.ENABLE_IRC_COLOR_MARKUP and not config.ENABLE_EMOJI_SHORTCODES and not config.ENABLE_ASCIIMOJI_SHORTCODES and not config.ENABLE_SPELLCHECK and not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_MARKDOWN_MARKUP and not config.ENABLE_IRC_COLOR_MARKUP and not config.ENABLE_EMOJI_SHORTCODES and not config.ENABLE_ASCIIMOJI_SHORTCODES and not config.ENABLE_SPELLCHECK and not config.ENABLE_SCRIPTING_ENGINE:
 			return False
 		else:
 			return True
@@ -2038,7 +2038,7 @@ class Window(QMainWindow):
 
 			if config.ALLOW_MENUS_TO_CHANGE_SPELLCHECK_SETTINGS: self.settingsMenu.addMenu(self.spellcheckMenu)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 
 			self.settingsMenu.addSeparator()
 
@@ -4790,7 +4790,7 @@ class TextInputWidget(QPlainTextEdit):
 										self.ensureCursorVisible()
 										return
 				
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					if config.AUTOCOMPLETE_FILENAMES:
 						# Auto-complete script filenames
 						if self.text().strip().startswith(config.ISSUE_COMMAND_SYMBOL+'script') or self.text().strip().startswith(config.ISSUE_COMMAND_SYMBOL+'edit'):

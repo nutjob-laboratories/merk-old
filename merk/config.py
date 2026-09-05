@@ -237,7 +237,7 @@ SHOW_MISSPELLED_WORDS_IN_ITALICS = False
 SHOW_MISSPELLED_WORDS_IN_BOLD = False
 SHOW_MISSPELLED_WORDS_IN_STRIKEOUT = False
 SHOW_MISSPELLED_WORDS_IN_COLOR = False
-SCRIPTING_ENGINE_ENABLED = True
+ENABLE_SCRIPTING_ENGINE = True
 SHOW_PINGS_IN_CONSOLE = False
 CLOSING_SERVER_WINDOW_DISCONNECTS = False
 SHOW_IGNORE_STATUS_IN_USERLISTS = True
@@ -481,9 +481,6 @@ LIMIT_LOG_VIEW = True
 LOG_WARNING_SIZE = 30
 SCAN_FOR_LARGE_LOGS = True
 SHOW_CHANNEL_MODES = True
-SHOW_AWAY_IN_WINDOWS_MENU = True
-SHOW_NICK_IN_WINDOWS_MENU = True
-SHOW_JOIN_IN_WINDOWS_MENU = True
 WINDOWS_MENU_WINDOW_SHORTCUTS = True
 WINDOWS_MENU_MANAGEMENT_SHORTCUTS = True
 DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = True
@@ -492,8 +489,13 @@ SHOW_STATUS_IN_USERLIST_MENU = False
 SHOW_FILE_EDITING_IN_TOOLS = True
 SHOW_RESTART_IN_SETTINGS_MENU = False
 
+SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = True
+SHOW_AWAY_IN_WINDOWS_MENU = True
+
 def build_settings():
 	settings = {
+		"show_join_and_nick_in_windows_menu": SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU,
+		"show_away_control_in_windows_menu": SHOW_AWAY_IN_WINDOWS_MENU,
 		"show_restart_in_settings_menu": SHOW_RESTART_IN_SETTINGS_MENU,
 		"edit_files_in_tools_menu": SHOW_FILE_EDITING_IN_TOOLS,
 		"show_status_in_userlist_menus": SHOW_STATUS_IN_USERLIST_MENU,
@@ -501,9 +503,6 @@ def build_settings():
 		"show_window_information_in_status_bar": DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR,
 		"subwindow_management_shortcuts_in_windows_menu": WINDOWS_MENU_MANAGEMENT_SHORTCUTS,
 		"subwindow_shortcuts_in_windows_menu": WINDOWS_MENU_WINDOW_SHORTCUTS,
-		"show_join_in_windows_menu": SHOW_JOIN_IN_WINDOWS_MENU,
-		"show_nickname_in_windows_menu": SHOW_NICK_IN_WINDOWS_MENU,
-		"show_away_control_in_windows_menu": SHOW_AWAY_IN_WINDOWS_MENU,
 		"show_channel_modes": SHOW_CHANNEL_MODES,
 		"scan_for_large_logs_on_startup": SCAN_FOR_LARGE_LOGS,
 		"log_warning_size": LOG_WARNING_SIZE,
@@ -746,7 +745,7 @@ def build_settings():
 		"show_ignore_status_in_userlists": SHOW_IGNORE_STATUS_IN_USERLISTS,
 		"closing_server_window_disconnects_from_server": CLOSING_SERVER_WINDOW_DISCONNECTS,
 		"display_server_pings_in_server_window": SHOW_PINGS_IN_CONSOLE,
-		"enable_scripting": SCRIPTING_ENGINE_ENABLED,
+		"enable_scripting": ENABLE_SCRIPTING_ENGINE,
 		"spellcheck_in_color": SHOW_MISSPELLED_WORDS_IN_COLOR,
 		"spellcheck_in_strikeout": SHOW_MISSPELLED_WORDS_IN_STRIKEOUT,
 		"spellcheck_underline_color": SPELLCHECK_UNDERLINE_COLOR,
@@ -944,6 +943,10 @@ def build_settings():
 	return settings
 
 def patch_settings(settings):
+	if not "show_join_and_nick_in_windows_menu" in settings:
+		settings["show_join_and_nick_in_windows_menu"] = SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU
+	if not "show_away_control_in_windows_menu" in settings:
+		settings["show_away_control_in_windows_menu"] = SHOW_AWAY_IN_WINDOWS_MENU
 	if not "show_restart_in_settings_menu" in settings:
 		settings["show_restart_in_settings_menu"] = SHOW_RESTART_IN_SETTINGS_MENU
 	if not "edit_files_in_tools_menu" in settings:
@@ -958,12 +961,6 @@ def patch_settings(settings):
 		settings["subwindow_management_shortcuts_in_windows_menu"] = WINDOWS_MENU_MANAGEMENT_SHORTCUTS
 	if not "subwindow_shortcuts_in_windows_menu" in settings:
 		settings["subwindow_shortcuts_in_windows_menu"] = WINDOWS_MENU_WINDOW_SHORTCUTS
-	if not "show_join_in_windows_menu" in settings:
-		settings["show_join_in_windows_menu"] = SHOW_JOIN_IN_WINDOWS_MENU
-	if not "show_nickname_in_windows_menu" in settings:
-		settings["show_nickname_in_windows_menu"] = SHOW_NICK_IN_WINDOWS_MENU
-	if not "show_away_control_in_windows_menu" in settings:
-		settings["show_away_control_in_windows_menu"] = SHOW_AWAY_IN_WINDOWS_MENU
 	if not "show_channel_modes" in settings:
 		settings["show_channel_modes"] = SHOW_CHANNEL_MODES
 	if not "scan_for_large_logs_on_startup" in settings:
@@ -1449,7 +1446,7 @@ def patch_settings(settings):
 	if not "display_server_pings_in_server_window" in settings:
 		settings["display_server_pings_in_server_window"] = SHOW_PINGS_IN_CONSOLE
 	if not "enable_scripting" in settings:
-		settings["enable_scripting"] = SCRIPTING_ENGINE_ENABLED
+		settings["enable_scripting"] = ENABLE_SCRIPTING_ENGINE
 	if not "spellcheck_in_color" in settings:
 		settings["spellcheck_in_color"] = SHOW_MISSPELLED_WORDS_IN_COLOR
 	if not "spellcheck_in_strikeout" in settings:
@@ -2030,7 +2027,7 @@ def load_settings(filename):
 	global SHOW_MISSPELLED_WORDS_IN_BOLD
 	global SHOW_MISSPELLED_WORDS_IN_STRIKEOUT
 	global SHOW_MISSPELLED_WORDS_IN_COLOR
-	global SCRIPTING_ENGINE_ENABLED
+	global ENABLE_SCRIPTING_ENGINE
 	global SHOW_PINGS_IN_CONSOLE
 	global CLOSING_SERVER_WINDOW_DISCONNECTS
 	global SHOW_IGNORE_STATUS_IN_USERLISTS
@@ -2273,9 +2270,6 @@ def load_settings(filename):
 	global LOG_WARNING_SIZE
 	global SCAN_FOR_LARGE_LOGS
 	global SHOW_CHANNEL_MODES
-	global SHOW_AWAY_IN_WINDOWS_MENU
-	global SHOW_NICK_IN_WINDOWS_MENU
-	global SHOW_JOIN_IN_WINDOWS_MENU
 	global WINDOWS_MENU_WINDOW_SHORTCUTS
 	global WINDOWS_MENU_MANAGEMENT_SHORTCUTS
 	global DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR
@@ -2283,6 +2277,8 @@ def load_settings(filename):
 	global SHOW_STATUS_IN_USERLIST_MENU
 	global SHOW_FILE_EDITING_IN_TOOLS
 	global SHOW_RESTART_IN_SETTINGS_MENU
+	global SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU
+	global SHOW_AWAY_IN_WINDOWS_MENU
 
 	if os.path.isfile(filename):
 		with open(filename, "r") as read_settings:
@@ -2292,6 +2288,8 @@ def load_settings(filename):
 		settings = patch_settings(settings)
 		postpatch_length = len(settings)
 
+		SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = settings["show_join_and_nick_in_windows_menu"]
+		SHOW_AWAY_IN_WINDOWS_MENU = settings["show_away_control_in_windows_menu"]
 		SHOW_RESTART_IN_SETTINGS_MENU = settings["show_restart_in_settings_menu"]
 		SHOW_FILE_EDITING_IN_TOOLS = settings["edit_files_in_tools_menu"]
 		SHOW_STATUS_IN_USERLIST_MENU = settings["show_status_in_userlist_menus"]
@@ -2299,9 +2297,6 @@ def load_settings(filename):
 		DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = settings["show_window_information_in_status_bar"]
 		WINDOWS_MENU_MANAGEMENT_SHORTCUTS = settings["subwindow_management_shortcuts_in_windows_menu"]
 		WINDOWS_MENU_WINDOW_SHORTCUTS = settings["subwindow_shortcuts_in_windows_menu"]
-		SHOW_JOIN_IN_WINDOWS_MENU = settings["show_join_in_windows_menu"]
-		SHOW_NICK_IN_WINDOWS_MENU = settings["show_nickname_in_windows_menu"]
-		SHOW_AWAY_IN_WINDOWS_MENU = settings["show_away_control_in_windows_menu"]
 		SHOW_CHANNEL_MODES = settings["show_channel_modes"]
 		SCAN_FOR_LARGE_LOGS = settings["scan_for_large_logs_on_startup"]
 		LOG_WARNING_SIZE = settings["log_warning_size"]
@@ -2544,7 +2539,7 @@ def load_settings(filename):
 		SHOW_IGNORE_STATUS_IN_USERLISTS = settings["show_ignore_status_in_userlists"]
 		CLOSING_SERVER_WINDOW_DISCONNECTS = settings["closing_server_window_disconnects_from_server"]
 		SHOW_PINGS_IN_CONSOLE = settings["display_server_pings_in_server_window"]
-		SCRIPTING_ENGINE_ENABLED = settings["enable_scripting"]
+		ENABLE_SCRIPTING_ENGINE = settings["enable_scripting"]
 		SHOW_MISSPELLED_WORDS_IN_COLOR = settings["spellcheck_in_color"]
 		SHOW_MISSPELLED_WORDS_IN_STRIKEOUT = settings["spellcheck_in_strikeout"]
 		SPELLCHECK_UNDERLINE_COLOR = settings["spellcheck_underline_color"]

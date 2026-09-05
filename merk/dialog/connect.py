@@ -163,7 +163,7 @@ class Dialog(QDialog):
 				user.LAST_RECONNECT = self.RECONNECT_OPTION
 				user.HISTORY = user_history
 
-				if config.SCRIPTING_ENGINE_ENABLED:
+				if config.ENABLE_SCRIPTING_ENGINE:
 					commands = self.commands.toPlainText()
 					if hostid in user.COMMANDS:
 						if len(commands.strip())==0:
@@ -207,7 +207,7 @@ class Dialog(QDialog):
 				return retval
 			else:
 
-				if config.SCRIPTING_ENGINE_ENABLED: connection_script.add_connection_script(hostid,self.commands.toPlainText())
+				if config.ENABLE_SCRIPTING_ENGINE: connection_script.add_connection_script(hostid,self.commands.toPlainText())
 
 				if len(self.password.text().strip())==0:
 					server_pass = None
@@ -449,14 +449,14 @@ class Dialog(QDialog):
 			self.ok_button.setEnabled(False)
 			self.sasl.setEnabled(False)
 			self.profile.setEnabled(False)
-			if config.SCRIPTING_ENGINE_ENABLED:
+			if config.ENABLE_SCRIPTING_ENGINE:
 				if len(host.strip())==0 or len(port.strip())==0:
 					self.commandHost.setText("<center><small><b>No server selected</b></small></center>")
 					self.commands.clear()
 		else:
 			self.ok_button.setEnabled(True)
 			self.sasl.setEnabled(True)
-			if config.SCRIPTING_ENGINE_ENABLED and hasattr(self,"commands_tab"):
+			if config.ENABLE_SCRIPTING_ENGINE and hasattr(self,"commands_tab"):
 				self.commandHost.setText(self.exeTemplate.replace('%__SERVER__%',hostid))
 			self.profile.setEnabled(True)
 			
@@ -673,7 +673,7 @@ class Dialog(QDialog):
 
 		if not SSL_AVAILABLE: self.ssl.hide()
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			self.exe = QCheckBox("Execute connection script",self)
 			self.exe.stateChanged.connect(self.clickExe)
 			self.exe.toggle()
@@ -723,7 +723,7 @@ class Dialog(QDialog):
 			self.clear.setEnabled(False)
 			self.edit.setEnabled(False)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			optionLayout.addRow(self.exe,QLabel(''))
 		optionLayout.setVerticalSpacing(0)
 
@@ -812,7 +812,7 @@ class Dialog(QDialog):
 		self.server_tab.setLayout(serverInfoLayout)
 		self.tabs.addTab(self.server_tab, QIcon(NETWORK_ICON), "Server")
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			self.commands_tab = QWidget()
 			self.commands_tab.setLayout(commandsLayout)
 			self.tabs.addTab(self.commands_tab, QIcon(SCRIPT_ICON), "Script")

@@ -252,7 +252,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		AUTOCOMPLETE_MULTI.pop(config.ISSUE_COMMAND_SYMBOL+"window install",'')
 		AUTOCOMPLETE_MULTI.pop(config.ISSUE_COMMAND_SYMBOL+"window uninstall",'')
 		AUTOCOMPLETE_MULTI.pop(config.ISSUE_COMMAND_SYMBOL+"window pause",'')
-	if not config.SCRIPTING_ENGINE_ENABLED:
+	if not config.ENABLE_SCRIPTING_ENGINE:
 		AUTOCOMPLETE_MULTI.pop(config.ISSUE_COMMAND_SYMBOL+"window layout",'')
 
 	# Entries for command autocomplete
@@ -385,7 +385,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		AUTOCOMPLETE.pop(config.ISSUE_COMMAND_SYMBOL+"alias",'')
 		AUTOCOMPLETE.pop(config.ISSUE_COMMAND_SYMBOL+"unalias",'')
 
-	if not config.SCRIPTING_ENGINE_ENABLED:
+	if not config.ENABLE_SCRIPTING_ENGINE:
 		AUTOCOMPLETE.pop(config.ISSUE_COMMAND_SYMBOL+"script",'')
 		AUTOCOMPLETE.pop(config.ISSUE_COMMAND_SYMBOL+"edit",'')
 		AUTOCOMPLETE.pop(config.ISSUE_COMMAND_SYMBOL+"macro",'')
@@ -426,7 +426,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		W_COMMAND.append("<b>install</b>")
 		W_COMMAND.append("<b>uninstall</b>")
 		W_COMMAND.append("<b>pause</b>")
-	if config.SCRIPTING_ENGINE_ENABLED:
+	if config.ENABLE_SCRIPTING_ENGINE:
 		W_COMMAND.append("<b>layout</b>")
 
 	W_COMMAND.sort()
@@ -542,7 +542,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"devoice [CHANNEL] NICKNAME [NICKNAME...]</b>", f"Removes voiced status from NICKNAME(s)" ],
 	]
 
-	if config.SCRIPTING_ENGINE_ENABLED:
+	if config.ENABLE_SCRIPTING_ENGINE:
 		for m in USER_MACROS:
 			name = USER_MACROS[m].name
 			script = USER_MACROS[m].script
@@ -591,7 +591,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		if not config.ENABLE_ALIASES:
 			if e[0]=="<b>"+config.ISSUE_COMMAND_SYMBOL+"alias [TOKEN] [TEXT...]</b>": continue
 			if e[0]=="<b>"+config.ISSUE_COMMAND_SYMBOL+"unalias TOKEN [...]</b>": continue
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			if e[0]=="<b>"+config.ISSUE_COMMAND_SYMBOL+"script FILENAME</b>": continue
 			if e[0]=="<b>"+config.ISSUE_COMMAND_SYMBOL+"edit [FILENAME]</b>": continue
 			if e[0]=="<b>"+config.ISSUE_COMMAND_SYMBOL+"s FILENAME [ARGUMENTS]</b>": continue
@@ -1760,7 +1760,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 	# |---------------|
 	# | Insert macros |
 	# |---------------|
-	if config.SCRIPTING_ENGINE_ENABLED:
+	if config.ENABLE_SCRIPTING_ENGINE:
 		for c in USER_MACROS:
 			a = USER_MACROS[c]
 			symbol = config.ISSUE_COMMAND_SYMBOL+a.name
@@ -3468,7 +3468,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 	# | /macro |
 	# |--------|
 	if len(tokens)>=1:
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'macro':
 				if is_script:
 					add_halt(script_id)
@@ -3714,7 +3714,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 	# | /unmacro |
 	# |----------|
 	if len(tokens)>=1:
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'unmacro':
 				if is_script:
 					add_halt(script_id)
@@ -5309,7 +5309,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'window' and len(tokens)==2:
 			if tokens[1].lower()=='layout':
 
-				if not config.SCRIPTING_ENGINE_ENABLED:
+				if not config.ENABLE_SCRIPTING_ENGINE:
 					if is_script:
 						add_halt(script_id)
 						if config.DISPLAY_SCRIPT_ERRORS:
@@ -5364,7 +5364,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'window' and len(tokens)==3:
 			if tokens[1].lower()=='layout':
 
-				if not config.SCRIPTING_ENGINE_ENABLED:
+				if not config.ENABLE_SCRIPTING_ENGINE:
 					if is_script:
 						add_halt(script_id)
 						if config.DISPLAY_SCRIPT_ERRORS:
@@ -7683,7 +7683,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 	# |-------|
 	if len(tokens)>=1:
 
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'edit':
 				t = Message(ERROR_MESSAGE,'',"Scripting is disabled")
 				window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
@@ -8674,7 +8674,7 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 	# |---------|
 	if len(tokens)>=1:
 
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'script':
 				if is_script:
 					add_halt(script_id)
@@ -10443,7 +10443,7 @@ class ScriptThread(QThread):
 
 			# This should never happen, but if it does...
 			# Do not execute any scripts if scripting is disabled
-			if not config.SCRIPTING_ENGINE_ENABLED:
+			if not config.ENABLE_SCRIPTING_ENGINE:
 				self.handle_script_error.emit([self.gui,self.window,f"Scripting has been disabled"])
 				no_errors = False
 

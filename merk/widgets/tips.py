@@ -253,7 +253,7 @@ if config.ENABLE_PLUGINS:
 	]
 	TIPS = TIPS + p
 
-if config.SCRIPTING_ENGINE_ENABLED:
+if config.ENABLE_SCRIPTING_ENGINE:
 	s = [
 		f'You can write, edit, and execute scripts with the <b>Script Editor</b>!',
 		f'<b>Connection scripts</b> allow you to automatically send commands as soon as you connect!',

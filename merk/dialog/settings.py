@@ -3036,7 +3036,7 @@ class Dialog(QDialog):
 			The <b>menubar</b> is a toolbar widget that takes the place of the menus of a
 			"normal" application. The <b>menubar</b> can be moved to either the <b>top</b>
 			of the main window, the <b>bottom</b> of the main window, or can be optionally
-			<b>movable</b>.
+			<b>movable</b>.<br>
 			</small>
 			""")
 		self.menubarDescription.setWordWrap(True)
@@ -3245,23 +3245,11 @@ class Dialog(QDialog):
 		if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU: self.showConnScript.setChecked(True)
 		self.showConnScript.stateChanged.connect(self.changedSetting)
 
-		self.showWinAway = QCheckBox(f"Away/Back control",self)
-		if config.SHOW_AWAY_IN_WINDOWS_MENU: self.showWinAway.setChecked(True)
-		self.showWinAway.stateChanged.connect(self.changedSetting)
-
-		self.showWinNick = QCheckBox(f"Nickname control",self)
-		if config.SHOW_NICK_IN_WINDOWS_MENU: self.showWinNick.setChecked(True)
-		self.showWinNick.stateChanged.connect(self.changedSetting)
-
-		self.showWinJoin = QCheckBox(f"Channel join",self)
-		if config.SHOW_JOIN_IN_WINDOWS_MENU: self.showWinJoin.setChecked(True)
-		self.showWinJoin.stateChanged.connect(self.changedSetting)
-
 		self.showWinShortcuts = QCheckBox(f"Subwindow shortcuts",self)
 		if config.WINDOWS_MENU_WINDOW_SHORTCUTS: self.showWinShortcuts.setChecked(True)
 		self.showWinShortcuts.stateChanged.connect(self.changedSetting)
 
-		self.showWinManShort = QCheckBox(f"Subwindow management shortcuts",self)
+		self.showWinManShort = QCheckBox(f"Subwindow management",self)
 		if config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS: self.showWinManShort.setChecked(True)
 		self.showWinManShort.stateChanged.connect(self.changedSetting)
 
@@ -3274,12 +3262,20 @@ class Dialog(QDialog):
 		menu4Layout.addWidget(self.showConnScript)
 
 		menu5Layout = QHBoxLayout()
-		menu5Layout.addWidget(self.showWinAway)
-		menu5Layout.addWidget(self.showWinNick)
+		menu5Layout.addWidget(self.showWinShortcuts)
+		menu5Layout.addWidget(self.showWinManShort)
+
+		self.showJoinNick = QCheckBox(f"JOIN and NICK",self)
+		if config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU: self.showJoinNick.setChecked(True)
+		self.showJoinNick.stateChanged.connect(self.changedSetting)
+
+		self.showAwayControls = QCheckBox(f"Away/back control",self)
+		if config.SHOW_AWAY_IN_WINDOWS_MENU: self.showAwayControls.setChecked(True)
+		self.showAwayControls.stateChanged.connect(self.changedSetting)
 
 		menu6Layout = QHBoxLayout()
-		menu6Layout.addWidget(self.showWinJoin)
-		menu6Layout.addWidget(self.showWinShortcuts)
+		menu6Layout.addWidget(self.showJoinNick)
+		menu6Layout.addWidget(self.showAwayControls)
 
 		menu1Layout = QHBoxLayout()
 		menu1Layout.addStretch()
@@ -3297,21 +3293,21 @@ class Dialog(QDialog):
 		if config.SHOW_FILE_EDITING_IN_TOOLS: self.showFileEdit.setChecked(True)
 		self.showFileEdit.stateChanged.connect(self.changedSetting)
 
-		llMenuLayout = QHBoxLayout()
-		llMenuLayout.addWidget(self.menubarMenu)
-		llMenuLayout.addWidget(self.showFileEdit)
-
 		self.showRestart = QCheckBox(f"Show restart in the \"{config.MAIN_MENU_SETTINGS_NAME}\" menu",self)
 		if config.SHOW_RESTART_IN_SETTINGS_MENU: self.showRestart.setChecked(True)
 		self.showRestart.stateChanged.connect(self.changedSetting)
 
+		justRightLayout = QHBoxLayout()
+		justRightLayout.addLayout(justifyLayout)
+		justRightLayout.addWidget(self.menubarMenu)
+
 		msLayout = QVBoxLayout()
-		msLayout.setSpacing(0)
+		msLayout.setSpacing(2)
 		msLayout.addWidget(self.menubarDescription)
 		msLayout.addLayout(menu1Layout)
 		msLayout.addLayout(menu2Layout)
-		msLayout.addLayout(justifyLayout)
-		msLayout.addLayout(llMenuLayout)
+		msLayout.addLayout(justRightLayout)
+		msLayout.addWidget(self.showFileEdit)
 		msLayout.addWidget(self.showRestart)
 
 		menuLayout = QVBoxLayout()
@@ -3326,9 +3322,8 @@ class Dialog(QDialog):
 		menuLayout.addWidget(widgets.textSeparatorLabel(self,f"<b>\"{config.MAIN_MENU_WINDOWS_NAME}\" menu includes...</b>"))
 		menuLayout.addLayout(menu3Layout)
 		menuLayout.addLayout(menu4Layout)
-		menuLayout.addLayout(menu5Layout)
 		menuLayout.addLayout(menu6Layout)
-		menuLayout.addWidget(self.showWinManShort)
+		menuLayout.addLayout(menu5Layout)
 		menuLayout.addStretch()
 
 		self.menuPage.setLayout(menuLayout)
@@ -6151,7 +6146,7 @@ class Dialog(QDialog):
 		self.enableAlias.stateChanged.connect(self.changedAlias)
 
 		self.enableScripts = QCheckBox("Enable scripting",self)
-		if config.SCRIPTING_ENGINE_ENABLED: self.enableScripts.setChecked(True)
+		if config.ENABLE_SCRIPTING_ENGINE: self.enableScripts.setChecked(True)
 		self.enableScripts.stateChanged.connect(self.changedScripting)
 
 		self.showErrors = QCheckBox("Show error messages when executing scripts",self)
@@ -6281,7 +6276,7 @@ class Dialog(QDialog):
 			self.enableBuiltin.setEnabled(False)
 			self.enableReadWrite.setEnabled(False)
 
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			self.restrictError.setEnabled(False)
 			self.haltError.setEnabled(False)
 			self.enableInsert.setEnabled(False)
@@ -6900,7 +6895,7 @@ class Dialog(QDialog):
 		if not config.ENABLE_ALIASES:
 			self.syntaxalias.setEnabled(False)
 
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			self.syntaxop.setEnabled(False)
 			self.syntaxscript.setEnabled(False)
 
@@ -7694,7 +7689,7 @@ class Dialog(QDialog):
 		config.SHOW_MISSPELLED_WORDS_IN_BOLD = self.spellcheckBold.isChecked()
 		config.SHOW_MISSPELLED_WORDS_IN_ITALICS = self.spellcheckItalics.isChecked()
 		config.SHOW_MISSPELLED_WORDS_IN_STRIKEOUT = self.spellcheckStrikout.isChecked()
-		config.SCRIPTING_ENGINE_ENABLED = self.enableScripts.isChecked()
+		config.ENABLE_SCRIPTING_ENGINE = self.enableScripts.isChecked()
 		config.SHOW_PINGS_IN_CONSOLE = self.enablePing.isChecked()
 		config.CLOSING_SERVER_WINDOW_DISCONNECTS = self.enableDisconnect.isChecked()
 		config.SHOW_IGNORE_STATUS_IN_USERLISTS = self.ignoreUserlist.isChecked()
@@ -7903,15 +7898,14 @@ class Dialog(QDialog):
 		config.MAX_LOG_DISPLAY_SIZE = self.MAX_LOG_DISPLAY_SIZE
 		config.SCAN_FOR_LARGE_LOGS = self.scanLogs.isChecked()
 		config.SHOW_CHANNEL_MODES = self.channelModes.isChecked()
-		config.SHOW_AWAY_IN_WINDOWS_MENU = self.showWinAway.isChecked()
-		config.SHOW_NICK_IN_WINDOWS_MENU = self.showWinNick.isChecked()
-		config.SHOW_JOIN_IN_WINDOWS_MENU = self.showWinJoin.isChecked()
 		config.WINDOWS_MENU_WINDOW_SHORTCUTS = self.showWinShortcuts.isChecked()
 		config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS = self.showWinManShort.isChecked()
 		config.DISPLAY_WINDOW_INFORMATION_IN_STATUSBAR = self.statusInfo.isChecked()
 		config.SHOW_STATUS_IN_USERLIST_MENU = self.statusMenus.isChecked()
 		config.SHOW_FILE_EDITING_IN_TOOLS = self.showFileEdit.isChecked()
 		config.SHOW_RESTART_IN_SETTINGS_MENU = self.showRestart.isChecked()
+		config.SHOW_AWAY_IN_WINDOWS_MENU = self.showAwayControls.isChecked()
+		config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = self.showJoinNick.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True
@@ -8182,7 +8176,7 @@ class Dialog(QDialog):
 				if not self.rerenderUsers: self.parent.rerenderUserlists()
 
 			if self.do_scripting:
-				if not config.SCRIPTING_ENGINE_ENABLED:
+				if not config.ENABLE_SCRIPTING_ENGINE:
 					for window in self.parent.getAllEditorWindows():
 						if hasattr(window,"widget"):
 							c = window.widget()

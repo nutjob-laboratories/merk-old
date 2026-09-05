@@ -1228,7 +1228,7 @@ class Merk(QMainWindow):
 				entry.triggered.connect((lambda : self.open_folder(plugins.PLUGIN_DIRECTORY)))
 				sm.addAction(entry)
 
-			if config.SCRIPTING_ENGINE_ENABLED:
+			if config.ENABLE_SCRIPTING_ENGINE:
 				entry = QAction(QIcon(SCRIPT_ICON),"Scripts directory",self)
 				entry.triggered.connect((lambda : self.open_folder(commands.SCRIPTS_DIRECTORY)))
 				sm.addAction(entry)
@@ -1387,7 +1387,7 @@ class Merk(QMainWindow):
 
 			# Execute global script, if it exists
 			if self.executed_global==False:
-				if config.EXECUTE_GLOBAL_SCRIPT and config.SCRIPTING_ENGINE_ENABLED:
+				if config.EXECUTE_GLOBAL_SCRIPT and config.ENABLE_SCRIPTING_ENGINE:
 					f = commands.find_script(config.GLOBAL_SCRIPT_FILE,None)
 					if f:
 						try:
@@ -1402,7 +1402,7 @@ class Merk(QMainWindow):
 		
 		self.nickChanged(client,True)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			if client.kwargs["execute_script"]==True:
 
 				hostid = client.server+":"+str(client.port)
@@ -1566,6 +1566,7 @@ class Merk(QMainWindow):
 			w.writeText(t)
 		
 	def away(self,client,msg):
+		self.buildWindowsMenu()
 		w = self.getServerWindow(client)
 		if w:
 			if config.SHOW_AWAY_AND_BACK_MESSAGES:
@@ -1585,6 +1586,7 @@ class Merk(QMainWindow):
 		self.buildWindowsMenu()
 
 	def back(self,client):
+		self.buildWindowsMenu()
 		w = self.getServerWindow(client)
 		if w:
 			if config.SHOW_AWAY_AND_BACK_MESSAGES:
@@ -4607,14 +4609,14 @@ class Merk(QMainWindow):
 						c.close()
 
 	def settingsScripting(self):
-		if config.SCRIPTING_ENGINE_ENABLED:
-			config.SCRIPTING_ENGINE_ENABLED = False
+		if config.ENABLE_SCRIPTING_ENGINE:
+			config.ENABLE_SCRIPTING_ENGINE = False
 		else:
-			config.SCRIPTING_ENGINE_ENABLED = True
+			config.ENABLE_SCRIPTING_ENGINE = True
 		self.save_config()
 		self.buildSettingsMenu()
 
-		if not config.SCRIPTING_ENGINE_ENABLED:
+		if not config.ENABLE_SCRIPTING_ENGINE:
 			for window in self.getAllEditorWindows():
 				if hasattr(window,"widget"):
 					c = window.widget()
@@ -5126,7 +5128,7 @@ class Merk(QMainWindow):
 
 		sm = self.settingsMenu.addMenu(QIcon(TOOLS_ICON),"Tools")
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			entry = QAction(QIcon(self.checked_icon),"Enable scripting", self)
 		else:
 			entry = QAction(QIcon(self.unchecked_icon),"Enable scripting", self)
@@ -5322,7 +5324,7 @@ class Merk(QMainWindow):
 			entry = widgets.ExtendedMenuItem(self,LOG_MENU_ICON,'Logs','View, manage, or export&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.menuExportLog)
 			self.toolsMenu.addAction(entry)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			entry = widgets.ExtendedMenuItem(self,SCRIPT_MENU_ICON,'Script Editor','Edit '+APPLICATION_NAME+' scripts&nbsp;&nbsp;',CUSTOM_MENU_ICON_SIZE,self.newEditorWindow)
 			self.toolsMenu.addAction(entry)
 
@@ -5335,7 +5337,7 @@ class Merk(QMainWindow):
 
 		if config.SHOW_FILE_EDITING_IN_TOOLS:
 
-			if config.SCRIPTING_ENGINE_ENABLED:
+			if config.ENABLE_SCRIPTING_ENGINE:
 				file_paths = []
 				for root, _, files in os.walk(commands.SCRIPTS_DIRECTORY):
 					for file in files:
@@ -5410,7 +5412,7 @@ class Merk(QMainWindow):
 			entry.triggered.connect((lambda : self.open_folder(plugins.PLUGIN_DIRECTORY)))
 			sm.addAction(entry)
 
-		if config.SCRIPTING_ENGINE_ENABLED:
+		if config.ENABLE_SCRIPTING_ENGINE:
 			entry = QAction(QIcon(SCRIPT_ICON),"Scripts directory",self)
 			entry.triggered.connect((lambda : self.open_folder(commands.SCRIPTS_DIRECTORY)))
 			sm.addAction(entry)
@@ -5599,17 +5601,7 @@ class Merk(QMainWindow):
 				icon = None
 				if c.window_type==SERVER_WINDOW:
 					counter = counter + 1
-					if self.multiple_servers:
-						if c.client.network.lower()==config.UNKNOWN_NETWORK_NAME.lower():
-							if c.client.hostname:
-								tnet = c.client.hostname
-							else:
-								tnet = c.client.server+":"+str(c.client.port)
-						else:
-							tnet = c.client.network
-						target = f"{c.name} ({tnet})"
-					else:
-						target = f"{c.name}"
+					target = f"{c.name}"
 					entry = QAction(QIcon(CONSOLE_ICON),target,self)
 					entry.triggered.connect(lambda state,u=window: self.showSubWindow(u))
 					if config.WINDOWS_MENU_WINDOW_SHORTCUTS: entry.setShortcut(QKeySequence(f"Alt+{counter}"))
@@ -5784,15 +5776,19 @@ class Merk(QMainWindow):
 		if len(listOfConnections)>0:
 
 			add_menus = False
+			registered_connections = len(listOfConnections)
 			for i in listOfConnections:
-				if listOfConnections[i].registered: add_menus = True
+				if listOfConnections[i].registered:
+					add_menus = True
+				else:
+					registered_connections = registered_connections - 1
 
 			# Don't add any server submenus (even if they're disabled)
 			# until at least ONE of the connections has registered
 			# with the server; unregistered connections will still
 			# have their submenu disabled
 			if add_menus:
-				e = textSeparator(self,"active connections")
+				e = textSeparator(self,f"connection{'s' if registered_connections>1 else ''}")
 				self.windowsMenu.addAction(e)
 
 				for i in listOfConnections:
@@ -5810,70 +5806,123 @@ class Merk(QMainWindow):
 						if hasattr(sw,"widget"):
 
 							c = sw.widget()
-							if hasattr(c.client,"network"):
-								mynet = c.client.network
-							else:
-								mynet = config.UNKNOWN_NETWORK_NAME
 
-							sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
+							# Only add server menus for connections that
+							# are fully connected and registered
+							if c.client.registered:
 
-							if not c.client.registered: sm.setEnabled(False)
+								if hasattr(c.client,"network"):
+									mynet = c.client.network
+								else:
+									mynet = config.UNKNOWN_NETWORK_NAME
 
-							if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
-								netlink = get_network_link(mynet)
-								if netlink!=None:
-									desc = f"<b><a href=\"{netlink}\">Visit network website</a></b>"
+								sm = self.windowsMenu.addMenu(QIcon(NETWORK_ICON),name)
+
+								if config.SHOW_LINKS_TO_NETWORK_WEBPAGES:
+									netlink = get_network_link(mynet)
+									if netlink!=None:
+										desc = f"<b><a href=\"{netlink}\">Visit network website</a></b>"
+									else:
+										desc = "<b>IRC Network</b>"
 								else:
 									desc = "<b>IRC Network</b>"
-							else:
-								desc = "<b>IRC Network</b>"
 
-							if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
-								wentry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
-								sm.addAction(wentry)
-
-							if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU:
-								wentry = QAction(QIcon(LIST_ICON),"Search channel list",self)
-								wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
-								sm.addAction(wentry)
-
-							if config.SHOW_LOGS_IN_WINDOWS_MENU and (len(os.listdir(logs.LOG_DIRECTORY))>0):
-								if len(logs.find_network_logs(f"{mynet}"))>0:
-									wentry = QAction(QIcon(LOG_ICON),f"View logs for {mynet}",self)
-									wentry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
+								if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
+									wentry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
 									sm.addAction(wentry)
 
-							if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.SCRIPTING_ENGINE_ENABLED:
-								hostid = c.client.server+":"+str(c.client.port)
-								wentry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
-								wentry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
-								sm.addAction(wentry)
+								show_sep = False
+								separator = sm.addSeparator()
+								separator.setVisible(False)
 
-							if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU:
-								ssetting = sm.addMenu(c.server_info_menu)
-								ssetting.setIcon(QIcon(SETTINGS_ICON))
+								if config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU:
+									wentry = QAction(QIcon(CHANNEL_ICON),"Join a channel",self)
+									wentry.triggered.connect(c.joinChannel)
+									sm.addAction(wentry)
 
-							e = textSeparator(self,"subwindows")
-							sm.addAction(e)
+									wentry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
+									wentry.triggered.connect(c.changeNick)
+									sm.addAction(wentry)
 
-							# Server subwindow
-							for w in irc_windows:
-								if w==sw:
-									sm.addAction(irc_windows[w])
+									show_sep = True
 
-							# Channel and private chat subwindows
-							for w in wl:
-								c = w.widget()
+								if config.SHOW_AWAY_IN_WINDOWS_MENU:
+									if c.client.is_away:
+										wentry = QAction(QIcon(GO_BACK_ICON),"Set status to \"back\"",self)
+									else:
+										wentry = QAction(QIcon(GO_AWAY_ICON),"Set status to \"away\"",self)
+									wentry.triggered.connect(c.changeAway)
+									sm.addAction(wentry)
 
-								for chat in irc_windows:
-									if chat==w:
-										sm.addAction(irc_windows[chat])
+									show_sep = True
+								
+								if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU:
+									wentry = QAction(QIcon(LIST_ICON),"Search channel list",self)
+									wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
+									sm.addAction(wentry)
 
-							# Channel list window for the server
-							for c in irc_windows:
-								w = c.widget()
-								if w.window_type==LIST_WINDOW and w.client==sw.widget().client:
-									sm.addAction(irc_windows[c])
+									show_sep = True
+
+								if config.SHOW_LOGS_IN_WINDOWS_MENU and (len(os.listdir(logs.LOG_DIRECTORY))>0):
+									if len(logs.find_network_logs(f"{mynet}"))>0:
+										wentry = QAction(QIcon(LOG_ICON),f"View logs for {mynet}",self)
+										wentry.triggered.connect(lambda state,u=mynet: self.menuExportLogTarget(u))
+										sm.addAction(wentry)
+
+										show_sep = True
+
+								if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.ENABLE_SCRIPTING_ENGINE:
+									hostid = c.client.server+":"+str(c.client.port)
+									wentry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
+									wentry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
+									sm.addAction(wentry)
+
+									show_sep = True
+
+								if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU:
+									ssetting = sm.addMenu(c.server_info_menu)
+									ssetting.setIcon(QIcon(SETTINGS_ICON))
+
+									show_sep = True
+
+								if show_sep: separator.setVisible(True)
+
+								# disconnect_entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),"Disconnect from server",self)
+								# disconnect_entry.triggered.connect(c.disconnect)
+								# f = disconnect_entry.font()
+								# f.setBold(True)
+								# disconnect_entry.setFont(f)
+
+								# Count the total number of subwindows for this server
+								win_total = 1
+								for w in wl:
+									for chat in irc_windows:
+										if chat==w: win_total = win_total +1
+								for c in irc_windows:
+									if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
+										win_total = win_total + 1
+
+								e = textSeparator(self,f"subwindow{'s' if win_total>1 else ''}")
+								sm.addAction(e)
+
+								# Server subwindow
+								for w in irc_windows:
+									if w==sw:
+										sm.addAction(irc_windows[w])
+
+								# Channel and private chat subwindows
+								for w in wl:
+									for chat in irc_windows:
+										if chat==w:
+											sm.addAction(irc_windows[chat])
+
+								# Channel list window for the server
+								for c in irc_windows:
+									if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
+										sm.addAction(irc_windows[c])
+
+						# sm.addSeparator()
+						# sm.addAction(disconnect_entry)
 
 		self.windowsMenu.addSeparator()
 
@@ -6892,7 +6941,7 @@ class MdiArea(QMdiArea):
 			name_without_extension, extension = os.path.splitext(file_path)
 
 			if extension=="."+SCRIPT_FILE_EXTENSION:
-				if not config.SCRIPTING_ENGINE_ENABLED:
+				if not config.ENABLE_SCRIPTING_ENGINE:
 					event.ignore()
 					return
 				self.openScript.emit(file_path)
