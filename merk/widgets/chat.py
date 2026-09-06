@@ -4057,10 +4057,11 @@ class Window(QMainWindow):
 
 	def resetInput(self):
 		cursor = self.input.textCursor()
+		pos = cursor.position()
 		user_input = self.input.text()
 		self.input.setText('')
 		self.input.setText(user_input)
-		self.input.moveCursor(cursor.position())
+		self.input.moveCursor(pos)
 
 	def handleTopicInput(self):
 		entered_topic = self.topic.text()

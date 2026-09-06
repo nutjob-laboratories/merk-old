@@ -473,11 +473,11 @@ class Window():
 			if len(self._window.users_protected)==0: return []
 			return self._window.users_protected
 
-		if status.lower()=='halfop':
+		if status.lower()=='halfop' or status.lower()=='half-operator':
 			if len(self._window.users_halfop)==0: return []
 			return self._window.users_halfop
 
-		if status.lower()=='admin':
+		if status.lower()=='admin' or status.lower()=='administrator':
 			if len(self._window.users_admin)==0: return []
 			return self._window.users_admin
 
@@ -489,7 +489,7 @@ class Window():
 			if len(self._window.users_voiced)==0: return []
 			return self._window.users_voiced
 		
-		if status.lower()=='operator':
+		if status.lower()=='operator' or status.lower()=='op':
 			if len(self._window.users_operator)==0: return []
 			return self._window.users_operator
 

@@ -121,10 +121,10 @@ class SyntaxColor(QWidget):
 		self.setColor.setStyleSheet(buttonStyleSheet)
 		fm = QFontMetrics(self.font())
 		fheight = fm.height()
-		self.setColor.setFixedSize(fheight+8,fheight+8)
+		self.setColor.setFixedSize(fheight+STYLE_COLOR_BUTTON_ADDON_SIZE,fheight+STYLE_COLOR_BUTTON_ADDON_SIZE)
 
 		self.setBold = QCheckBox("",self)
-		self.setBold.setIcon(QIcon(self.parent.parent.bold_icon))
+		self.setBold.setIcon(QIcon(BOLD_ICON))
 		self.setBold.setToolTip("Bold")
 		self.setBold.stateChanged.connect(self.checkBold)
 		if self.bold:
@@ -133,15 +133,13 @@ class SyntaxColor(QWidget):
 			self.setBold.setCheckState(Qt.Unchecked)
 
 		self.setItalic = QCheckBox("",self)
-		self.setItalic.setIcon(QIcon(self.parent.parent.italic_icon))
+		self.setItalic.setIcon(QIcon(ITALIC_ICON))
 		self.setItalic.setToolTip("Italic")
 		self.setItalic.stateChanged.connect(self.checkItalic)
 		if self.italic:
 			self.setItalic.setCheckState(Qt.Checked)
 		else:
 			self.setItalic.setCheckState(Qt.Unchecked)
-
-		
 
 		controlsLayout = QHBoxLayout()
 		controlsLayout.setSpacing(0)
@@ -220,7 +218,7 @@ class SyntaxTextColor(QWidget):
 		self.setColor.setStyleSheet(buttonStyleSheet)
 		fm = QFontMetrics(self.font())
 		fheight = fm.height()
-		self.setColor.setFixedSize(fheight+8,fheight+8)
+		self.setColor.setFixedSize(fheight+STYLE_COLOR_BUTTON_ADDON_SIZE,fheight+STYLE_COLOR_BUTTON_ADDON_SIZE)
 
 		controlsLayout = QHBoxLayout()
 		controlsLayout.addWidget(self.descriptionLabel)

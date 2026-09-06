@@ -239,6 +239,8 @@ WINDOWBAR_ENTRY_SPACING = 8
 WINDOWBAR_ADDON_HEIGHT = 12
 WINDOWBAR_SPILLOVER_TRIGGER_SIZE = 0.75
 
+STYLE_COLOR_BUTTON_ADDON_SIZE = 0
+
 # Icons
 
 # Light mode icons
@@ -247,8 +249,6 @@ ROUND_CHECKED_ICON = ":/icon-rchecked.png"
 CHECKED_ICON = ":/icon-checked.png"
 UNCHECKED_ICON = ":/icon-unchecked.png"
 OPTIONS_ICON = ":/icon-options.png"
-BOLD_ICON = ":/icon-bold.png"
-ITALIC_ICON = ":/icon-italic.png"
 MDI_BACKGROUND = ":/gui-background.png"
 
 # Dark mode icons
@@ -257,11 +257,11 @@ DARK_ROUND_CHECKED_ICON = ":/icon-dark_rchecked.png"
 DARK_CHECKED_ICON = ":/icon-dark_checked.png"
 DARK_UNCHECKED_ICON = ":/icon-dark_unchecked.png"
 DARK_OPTIONS_ICON = ":/icon-dark_options.png"
-DARK_BOLD_ICON = ":/icon-dark_bold.png"
-DARK_ITALIC_ICON = ":/icon-dark_italic.png"
 DARK_MDI_BACKGROUND = ":/gui-dark_background.png"
 
 # All other icons
+BOLD_ICON = ":/icon-bold.png"
+ITALIC_ICON = ":/icon-italic.png"
 LENGTH_ICON = ":/icon-length.png"
 APPLICATION_ICON = ":/icon-app.png"
 NEXT_ICON = ":/icon-next.png"

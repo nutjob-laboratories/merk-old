@@ -442,6 +442,9 @@ class Dialog(QDialog):
 			ui.setIcon(QIcon(OWNER_USER))
 			ui.setText('owner')
 		ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+		f = ui.font()
+		f.setBold(True)
+		ui.setFont(f)
 		self.userlist.addItem(ui)
 
 		ui = QListWidgetItem()
@@ -451,6 +454,9 @@ class Dialog(QDialog):
 			ui.setIcon(QIcon(ADMIN_USER))
 			ui.setText('admin')
 		ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+		f = ui.font()
+		f.setBold(True)
+		ui.setFont(f)
 		self.userlist.addItem(ui)
 
 		ui = QListWidgetItem()
@@ -460,6 +466,9 @@ class Dialog(QDialog):
 			ui.setIcon(QIcon(OP_USER))
 			ui.setText('chanop')
 		ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+		f = ui.font()
+		f.setBold(True)
+		ui.setFont(f)
 		self.userlist.addItem(ui)
 
 		ui = QListWidgetItem()
@@ -469,6 +478,9 @@ class Dialog(QDialog):
 			ui.setIcon(QIcon(HALFOP_USER))
 			ui.setText('halfop')
 		ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+		f = ui.font()
+		f.setBold(True)
+		ui.setFont(f)
 		self.userlist.addItem(ui)
 
 		ui = QListWidgetItem()
@@ -478,6 +490,9 @@ class Dialog(QDialog):
 			ui.setIcon(QIcon(VOICE_USER))
 			ui.setText('voiced')
 		ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+		f = ui.font()
+		f.setBold(True)
+		ui.setFont(f)
 		self.userlist.addItem(ui)
 
 		if config.SHOW_IGNORE_STATUS_IN_USERLISTS:
@@ -488,6 +503,9 @@ class Dialog(QDialog):
 				ui.setIcon(QIcon(NORMAL_USER))
 				ui.setText('user')
 			ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+			f = ui.font()
+			f.setBold(True)
+			ui.setFont(f)
 			self.userlist.addItem(ui)
 
 			ui = QListWidgetItem()
@@ -510,6 +528,9 @@ class Dialog(QDialog):
 				ui.setIcon(QIcon(NORMAL_USER))
 				ui.setText('user')
 			ui.setFlags(ui.flags() & ~Qt.ItemIsSelectable)
+			f = ui.font()
+			f.setBold(True)
+			ui.setFont(f)
 			self.userlist.addItem(ui)
 
 		if config.SHOW_AWAY_STATUS_IN_USERLISTS:
@@ -619,6 +640,7 @@ class Dialog(QDialog):
 
 		apply_button = buttons.button(QDialogButtonBox.Ok)
 		apply_button.setText(" Apply ")
+		apply_button.setDefault(True)
 
 		font = apply_button.font()
 		font.setBold(True)
@@ -636,18 +658,22 @@ class Dialog(QDialog):
 		saveAsButton = StylerButton(" Save style as... ")
 		saveAsButton.clicked.connect(self.saveAsStyle)
 		saveAsButton.setFont(smaller_font)
+		saveAsButton.setFocusPolicy(Qt.NoFocus)
 
 		loadButton = StylerButton(" Load style ")
 		loadButton.clicked.connect(self.loadStyle)
 		loadButton.setFont(smaller_font)
+		loadButton.setFocusPolicy(Qt.NoFocus)
 
 		defaultButton = StylerButton(f" Set colors to {APPLICATION_NAME} default ")
 		defaultButton.clicked.connect(self.loadDefault)
 		defaultButton.setFont(smaller_font)
+		defaultButton.setFocusPolicy(Qt.NoFocus)
 
 		self.load_default_button = StylerButton(" Load default ")
 		self.load_default_button.clicked.connect(self.loadDefault2)
 		self.load_default_button.setFont(smaller_font)
+		self.load_default_button.setFocusPolicy(Qt.NoFocus)
 
 		if default: self.load_default_button.setEnabled(False)
 
@@ -729,6 +755,9 @@ class Dialog(QDialog):
 				""")
 			self.stylerDescription.setWordWrap(True)
 			self.stylerDescription.setAlignment(Qt.AlignJustify)
+
+		for child in self.findChildren(QWidget):
+			child.setFocusPolicy(Qt.NoFocus)
 
 		finalLayout = QVBoxLayout()
 		if not self.simple:

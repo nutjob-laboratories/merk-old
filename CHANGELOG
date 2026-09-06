@@ -1,4 +1,37 @@
 |------------------------------------------------------------------------------|
+|                                   0.052.300                                  |
+|------------------------------------------------------------------------------|
+
+|==============================================================================|
+|                              APPLICATION CHANGES                             |
+|==============================================================================|
+
+* Changed the "open file" icon.
+* Changed the "folder" icon.
+* Changed the "bold" and "italics" icons. Previously, these icons had both
+  "dark mode" and "light mode" separate icons; the code for this (and the icons)
+  have been removed.
+* Bugfix: the userlist display in the text style editor was not showing entries
+  in bold (or NOT in bold) correctly.
+* Bugfix: changing the font while connected and chatting could result in the
+  chat display "cursor" being moved to an incorrect position.
+* Tweaked the "set color" button size in the "Settings" dialog and the text
+  styler. This shrinks the size of the text style editor down some.
+* All widgets in the text style dialog can no longer accept focus, and the
+  "Apply" button is now set to be the default button.
+
+|==============================================================================|
+|                              PLUGIN API CHANGES                              |
+|==============================================================================|
+
+* The Window class "status" method can now accept "op" or "operator" to test for
+  channel operator status.
+* The Window class "status" method can now accept "halfop" or "half-operator" to
+  test for channel half-operator status.
+* The Window class "status" method can now accept "admin" or "administrator" to
+  test for channel administrator status.
+
+|------------------------------------------------------------------------------|
 |                                   0.052.250                                  |
 |------------------------------------------------------------------------------|
 

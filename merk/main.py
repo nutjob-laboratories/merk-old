@@ -107,8 +107,6 @@ class Merk(QMainWindow):
 			self.round_checked_icon = DARK_ROUND_CHECKED_ICON
 			self.round_unchecked_icon = DARK_ROUND_UNCHECKED_ICON
 			self.options_icon = DARK_OPTIONS_ICON
-			self.bold_icon = DARK_BOLD_ICON
-			self.italic_icon = DARK_ITALIC_ICON
 			self.dark_mode = True
 		else:
 			self.checked_icon = CHECKED_ICON
@@ -116,8 +114,6 @@ class Merk(QMainWindow):
 			self.round_checked_icon = ROUND_CHECKED_ICON
 			self.round_unchecked_icon = ROUND_UNCHECKED_ICON
 			self.options_icon = OPTIONS_ICON
-			self.bold_icon = BOLD_ICON
-			self.italic_icon = ITALIC_ICON
 			self.dark_mode = False
 
 		# Set the application font
@@ -2878,6 +2874,8 @@ class Merk(QMainWindow):
 			c.setFont(newfont)
 			for widget in c.findChildren(QWidget):
 				widget.setFont(newfont)
+
+			if hasattr(c,"moveChatToBottom"): c.moveChatToBottom(True)
 
 		if is_deleted(w)==False:
 			self.MDI.setActiveSubWindow(w)
