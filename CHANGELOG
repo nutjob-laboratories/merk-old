@@ -2,14 +2,6 @@
 |                                   0.052.250                                  |
 |------------------------------------------------------------------------------|
 
-What's new:
-
-- **Many dialogs have been made easier to use for users that are new to IRC**.
-- **The options in the input options menu will *only* have an effect on the subwindow it was used on**. This allows users to temporarily disable MERK markdown, emojis, ASCIImojis, IRC color input, or change the spellchecking language for a specific subwindow.
-- **The `QUIT` message bug has been fixed**. When disconnecting from a server with the `/quit` command, the quit message was not always being sent to the server.
-- **The "Windows" menu is much more useful**. Currently active subwindows are shown in bold and hidden windows in italics. Shortcuts are displayed for every subwindow entry.
-- **Many, many bugfixes**.
-
 |==============================================================================|
 |                              APPLICATION CHANGES                             |
 |==============================================================================|
@@ -117,6 +109,8 @@ What's new:
 * Added settings to control whether the options to change the nickname, join a
   channel, or set away/back status are shown in the server submenu in the
   "Windows" menu.
+* Redid the layout of the "Run a script..." dialog.
+* Private chat windows now have a new icon.
 
 |------------------------------------------------------------------------------|
 |                                   0.052.200                                  |

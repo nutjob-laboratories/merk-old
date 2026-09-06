@@ -676,7 +676,7 @@ class Merk(QMainWindow):
 					if self.has_unread_messages(c.client,c.name): do_pulse = True
 					if self.has_unread_mentions(c.client,c.name): do_mention = True
 				elif c.window_type==PRIVATE_WINDOW:
-					icon = PRIVATE_ICON
+					icon = PRIVATE_WINDOW_ICON
 					wname = c.name
 					if c.client.hostname:
 						serv_name = name = c.client.hostname
@@ -819,7 +819,7 @@ class Merk(QMainWindow):
 					if self.has_unread_mentions(c.client,c.name): do_mention = True
 
 				elif c.window_type==PRIVATE_WINDOW:
-					icon = PRIVATE_ICON
+					icon = PRIVATE_WINDOW_ICON
 					wname = c.name
 					if c.client.hostname:
 						serv_name = name = c.client.hostname
@@ -1173,7 +1173,7 @@ class Merk(QMainWindow):
 								if c.window_type==CHANNEL_WINDOW:
 									icon = CHANNEL_ICON
 								elif c.window_type==PRIVATE_WINDOW:
-									icon = PRIVATE_ICON
+									icon = PRIVATE_WINDOW_ICON
 
 								entry = QAction(QIcon(icon),c.name,self)
 								entry.triggered.connect(lambda state,u=w: self.systrayShowWindow(u))
@@ -5630,7 +5630,7 @@ class Merk(QMainWindow):
 				if c.window_type==CHANNEL_WINDOW:
 					icon = CHANNEL_ICON
 				elif c.window_type==PRIVATE_WINDOW:
-					icon = PRIVATE_ICON
+					icon = PRIVATE_WINDOW_ICON
 				if icon!=None:
 					counter = counter + 1
 					if self.multiple_servers:
@@ -5871,7 +5871,11 @@ class Merk(QMainWindow):
 
 										show_sep = True
 
-								if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU and config.ENABLE_SCRIPTING_ENGINE:
+								if config.SHOW_SCRIPTING_IN_WINDOWS_MENU and config.ENABLE_SCRIPTING_ENGINE:
+									wentry = QAction(QIcon(RUN_ICON),"Run a script",self)
+									wentry.triggered.connect(c.scriptDialog)
+									sm.addAction(wentry)
+
 									hostid = c.client.server+":"+str(c.client.port)
 									wentry = QAction(QIcon(SCRIPT_ICON),"Edit connection script",self)
 									wentry.triggered.connect(lambda state,h=hostid: self.openEditorConnect(h))
@@ -5886,12 +5890,6 @@ class Merk(QMainWindow):
 									show_sep = True
 
 								if show_sep: separator.setVisible(True)
-
-								# disconnect_entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),"Disconnect from server",self)
-								# disconnect_entry.triggered.connect(c.disconnect)
-								# f = disconnect_entry.font()
-								# f.setBold(True)
-								# disconnect_entry.setFont(f)
 
 								# Count the total number of subwindows for this server
 								win_total = 1
@@ -5920,9 +5918,6 @@ class Merk(QMainWindow):
 								for c in irc_windows:
 									if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
 										sm.addAction(irc_windows[c])
-
-						# sm.addSeparator()
-						# sm.addAction(disconnect_entry)
 
 		self.windowsMenu.addSeparator()
 

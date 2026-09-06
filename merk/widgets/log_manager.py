@@ -405,7 +405,7 @@ class Window(QMainWindow):
 			self.setWindowTitle("Log Manager")
 
 		self.channel_file = QPixmap(CHANNEL_ICON)
-		self.private_file = QPixmap(PRIVATE_ICON)
+		self.private_file = QPixmap(PRIVATE_WINDOW_ICON)
 		self.blank_file = QPixmap(LOG_ICON)
 
 		icon_size = QSize(35, 35)

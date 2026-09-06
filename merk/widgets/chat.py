@@ -327,7 +327,7 @@ class Window(QMainWindow):
 			icon = CONSOLE_ICON
 			self.setWindowTitle(self.name)
 		elif self.window_type==PRIVATE_WINDOW:
-			icon = PRIVATE_ICON
+			icon = PRIVATE_WINDOW_ICON
 			self.setWindowTitle(self.name)
 		self.setWindowIcon(QIcon(icon))
 
@@ -1825,8 +1825,8 @@ class Window(QMainWindow):
 		action = menu.exec_(self.chat.mapToGlobal(location))
 
 	def scriptDialog(self):
-		x = dialog.GetScript(self.parent)
-		e = x.get_script_information(self.parent)
+		x = dialog.GetScript(self)
+		e = x.get_script_information(self)
 		if e:
 			script = e[0]
 			pretoken = e[1]
@@ -2833,7 +2833,7 @@ class Window(QMainWindow):
 			act.triggered.connect(lambda : self.client.sendLine("WHOIS "+user_nick))
 			self.userlist_menu.addAction(act)
 
-			act = QAction(QIcon(PRIVATE_ICON),"Open private chat", self)
+			act = QAction(QIcon(PRIVATE_WINDOW_ICON),"Open private chat", self)
 			act.triggered.connect(lambda : self.parent.openPrivate(self.client,user))
 			self.userlist_menu.addAction(act)
 

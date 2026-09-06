@@ -3241,15 +3241,15 @@ class Dialog(QDialog):
 		if config.SHOW_SERVER_INFO_IN_WINDOWS_MENU: self.showServerInfo.setChecked(True)
 		self.showServerInfo.stateChanged.connect(self.changedSetting)
 
-		self.showConnScript = QCheckBox(f"Connection script",self)
-		if config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU: self.showConnScript.setChecked(True)
+		self.showConnScript = QCheckBox(f"Scripting",self)
+		if config.SHOW_SCRIPTING_IN_WINDOWS_MENU: self.showConnScript.setChecked(True)
 		self.showConnScript.stateChanged.connect(self.changedSetting)
 
 		self.showWinShortcuts = QCheckBox(f"Subwindow shortcuts",self)
 		if config.WINDOWS_MENU_WINDOW_SHORTCUTS: self.showWinShortcuts.setChecked(True)
 		self.showWinShortcuts.stateChanged.connect(self.changedSetting)
 
-		self.showWinManShort = QCheckBox(f"Subwindow management",self)
+		self.showWinManShort = QCheckBox(f"Other shortcuts",self)
 		if config.WINDOWS_MENU_MANAGEMENT_SHORTCUTS: self.showWinManShort.setChecked(True)
 		self.showWinManShort.stateChanged.connect(self.changedSetting)
 
@@ -3258,8 +3258,8 @@ class Dialog(QDialog):
 		menu3Layout.addWidget(self.showLogsInWindows)
 
 		menu4Layout = QHBoxLayout()
-		menu4Layout.addWidget(self.showServerInfo)
 		menu4Layout.addWidget(self.showConnScript)
+		menu4Layout.addWidget(self.showServerInfo)
 
 		menu5Layout = QHBoxLayout()
 		menu5Layout.addWidget(self.showWinShortcuts)
@@ -3320,9 +3320,9 @@ class Dialog(QDialog):
 		menuLayout.addLayout(nameMenuEntries)
 		menuLayout.addWidget(QLabel(' '))
 		menuLayout.addWidget(widgets.textSeparatorLabel(self,f"<b>\"{config.MAIN_MENU_WINDOWS_NAME}\" menu includes...</b>"))
+		menuLayout.addLayout(menu6Layout)
 		menuLayout.addLayout(menu3Layout)
 		menuLayout.addLayout(menu4Layout)
-		menuLayout.addLayout(menu6Layout)
 		menuLayout.addLayout(menu5Layout)
 		menuLayout.addStretch()
 
@@ -7843,7 +7843,7 @@ class Dialog(QDialog):
 		config.FLASH_SYSTRAY_CHANNEL = self.systrayChannel.isChecked()
 		config.DISPLAY_IRC_ERRORS_IN_CURRENT_WINDOW = self.ircErrors.isChecked()
 		config.ALLOW_TOPIC_EDIT = self.topicEditor.isChecked()
-		config.SHOW_CONNECTION_SCRIPT_IN_WINDOWS_MENU = self.showConnScript.isChecked()
+		config.SHOW_SCRIPTING_IN_WINDOWS_MENU = self.showConnScript.isChecked()
 		config.SHOW_ALL_SERVER_ERRORS = self.ircAllErrors.isChecked()
 		config.HIGHLIGHT_NICKS_IN_CHAT = self.highlightNick.isChecked()
 		config.AUTOCOMPLETE_SERVERS = self.autocompleteServers.isChecked()

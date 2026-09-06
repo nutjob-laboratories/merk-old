@@ -80,11 +80,8 @@ class Dialog(QDialog):
 		self.parent = parent
 		self.script_name = ''
 
-		self.setWindowTitle("Execute script")
+		self.setWindowTitle(f"Execute script on \"{self.parent.name}\"")
 		self.setWindowIcon(QIcon(SCRIPT_ICON))
-
-		nameLayout = QHBoxLayout()
-		self.nameLabel = QLabel("<b>Filename:&nbsp;</b>")
 
 		scripts = []
 		for f in commands.list_scripts():
@@ -101,6 +98,7 @@ class Dialog(QDialog):
 		for e in scripts:
 			self.name.addItem(e)
 		self.name.setEditable(True)
+		self.nameLabel = QLabel("<b>Script:</b>")
 
 		self.file_button = QPushButton("")
 		self.file_button.setIcon(QIcon(OPENFILE_ICON))
@@ -108,32 +106,51 @@ class Dialog(QDialog):
 		self.file_button.setToolTip("Select a script")
 		self.file_button.setFlat(True)
 
-		nameLayout.addWidget(self.nameLabel)
-		nameLayout.addWidget(self.name)
-		nameLayout.addWidget(self.file_button)
-
 		self.argsLabel = QLabel("<b>Arguments:</b>")
-		
 		self.args = QLineEdit()
-		fm = QFontMetrics(self.font())
-		wwidth = fm.horizontalAdvance("ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF")
-		self.args.setMinimumWidth(wwidth)
-
-		argsLayout = QHBoxLayout()
-		argsLayout.addWidget(self.argsLabel)
-		argsLayout.addWidget(self.args)
 
 		# Buttons
 		buttons = QDialogButtonBox(self)
 		buttons.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-		buttons.button(QDialogButtonBox.Ok).setText("Execute script")
+		
+		ok_button = buttons.button(QDialogButtonBox.Ok)
+		ok_button.setText("Execute script")
+
+		font = ok_button.font()
+		font.setBold(True)
+		ok_button.setFont(font)
+
+		ok_button.setDefault(True)
+		ok_button.setAutoDefault(True)
+
+		cancel_button = buttons.button(QDialogButtonBox.Cancel)
+
+		for button in (ok_button, cancel_button):
+			button.setSizePolicy(
+				QSizePolicy.Expanding,
+				QSizePolicy.Preferred
+			)
+
 		buttons.accepted.connect(self.accept)
 		buttons.rejected.connect(self.reject)
 
+		button_layout = QHBoxLayout()
+		button_layout.addWidget(cancel_button, 1)
+		button_layout.addWidget(ok_button, 1)
+
+		allControls = QGridLayout()
+		allControls.addWidget(self.nameLabel, 0, 0)
+		allControls.addWidget(self.name, 0, 1)
+		allControls.addWidget(self.file_button, 0, 2)
+		allControls.addWidget(self.argsLabel, 1, 0)
+		allControls.addWidget(self.args, 1, 1, 1, 2)
+		allControls.setColumnStretch(1, 1)
+		allControls.setAlignment(self.nameLabel, Qt.AlignRight | Qt.AlignVCenter)
+		allControls.setAlignment(self.argsLabel, Qt.AlignRight | Qt.AlignVCenter)
+
 		finalLayout = QVBoxLayout()
-		finalLayout.addLayout(nameLayout)
-		finalLayout.addLayout(argsLayout)
-		finalLayout.addWidget(buttons)
+		finalLayout.addLayout(allControls)
+		finalLayout.addLayout(button_layout)
 
 		self.setWindowFlags(self.windowFlags()
 					^ QtCore.Qt.WindowContextHelpButtonHint)
