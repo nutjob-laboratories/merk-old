@@ -19,6 +19,26 @@
   styler. This shrinks the size of the text style editor down some.
 * All widgets in the text style dialog can no longer accept focus, and the
   "Apply" button is now set to be the default button.
+* Bugfix: the "user" icon was shown in the channel "copy channel name to
+  clipboard" option in the channel chat display right click menu.
+* Added an option (for privlileged users) to copy a channel's banlist to the
+  clipboard to the channel right click menu.
+* Tweaked the private chat and channel right click menus; the name of the 
+  current chat is now mentioned relatively frequently.
+* Changed the right click menu in the log manager to allow users to copy
+  selected text in the log viewer and strip IRC colors from the text before
+  storing it in the clipboard. The "cut" shortcut (Ctrl+X) has is used to
+  copy text without any IRC formatting or colors.
+* Changed the "new file" icon.
+* Changed the "save" icon.
+* Changed the "save as" icon.
+* The "/ctcp" command can now send PING requests. The "/ping" command (which did
+  this functionality) has been removed. The "/help" command text, as well as
+  the command documentation and the syntax highlighter, has been updated
+  accordingly.
+* Bugfix: the IRC client can now handle malformed PING replies without
+  displaying an error message.
+* Bugfix: the IRC client now handles CTCP PING replies properly.
 
 |==============================================================================|
 |                              PLUGIN API CHANGES                              |

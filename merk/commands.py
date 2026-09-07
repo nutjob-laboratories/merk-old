@@ -213,6 +213,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 			config.ISSUE_COMMAND_SYMBOL+"ctcp version": config.ISSUE_COMMAND_SYMBOL+"ctcp VERSION ",
 			config.ISSUE_COMMAND_SYMBOL+"ctcp source": config.ISSUE_COMMAND_SYMBOL+"ctcp SOURCE ",
 			config.ISSUE_COMMAND_SYMBOL+"ctcp finger": config.ISSUE_COMMAND_SYMBOL+"ctcp FINGER ",
+			config.ISSUE_COMMAND_SYMBOL+"ctcp ping": config.ISSUE_COMMAND_SYMBOL+"ctcp PING ",
 			config.ISSUE_COMMAND_SYMBOL+"config import": config.ISSUE_COMMAND_SYMBOL+"config import ",
 			config.ISSUE_COMMAND_SYMBOL+"config export": config.ISSUE_COMMAND_SYMBOL+"config export ",
 			config.ISSUE_COMMAND_SYMBOL+"window restart": config.ISSUE_COMMAND_SYMBOL+"window restart",
@@ -301,7 +302,6 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 			config.ISSUE_COMMAND_SYMBOL+"ignore": config.ISSUE_COMMAND_SYMBOL+"ignore ",
 			config.ISSUE_COMMAND_SYMBOL+"unignore": config.ISSUE_COMMAND_SYMBOL+"unignore ",
 			config.ISSUE_COMMAND_SYMBOL+"find": config.ISSUE_COMMAND_SYMBOL+"find ",
-			config.ISSUE_COMMAND_SYMBOL+"ping": config.ISSUE_COMMAND_SYMBOL+"ping ",
 			config.ISSUE_COMMAND_SYMBOL+"ctcp": config.ISSUE_COMMAND_SYMBOL+"ctcp ",
 			config.ISSUE_COMMAND_SYMBOL+"query": config.ISSUE_COMMAND_SYMBOL+"query ",
 			config.ISSUE_COMMAND_SYMBOL+"delay": config.ISSUE_COMMAND_SYMBOL+"delay ",
@@ -489,8 +489,7 @@ def build_help_and_autocomplete(new_autocomplete=None,new_help=None):
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"ignore USER</b>", "Hides a user's chat. USER can be a nickname or hostmask" ],
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"unignore USER</b>", "Un-hides a user's chat. To un-hide all users, use <b>*</b> as the argument" ],
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"find [TERMS]</b>", "Finds filenames that can be found by other commands; use <b>*</b> for multi-character wildcards, and <b>?</b> for single character wildcards" ],
-		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"ping USER [TEXT]</b>", "Sends a CTCP ping to a user" ],
-		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"ctcp REQUEST USER</b>", "Sends a CTCP request; valid requests are TIME, VERSION, USERINFO, SOURCE, or FINGER" ],
+		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"ctcp REQUEST USER</b>", "Sends a CTCP request; valid requests are FINGER, PING, SOURCE, TIME, USERINFO, or VERSION" ],
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"query NICKNAME [MESSAGE...]</b>", "Opens a private chat subwindow for NICKNAME" ],
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"delay SECONDS COMMAND...</b>", "Executes COMMAND after SECONDS seconds" ],
 		[ "<b>"+config.ISSUE_COMMAND_SYMBOL+"hide [SERVER] [WINDOW]</b>", "Hides a subwindow" ],
@@ -6493,14 +6492,16 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 				pass
 			elif request=="SOURCE":
 				pass
+			elif request=="PING":
+				pass
 			else:
 				if is_script:
 					add_halt(script_id)
 					if config.DISPLAY_SCRIPT_ERRORS:
-						t = Message(ERROR_MESSAGE,'',f"{script_file}, line {line_number}: {config.ISSUE_COMMAND_SYMBOL}ctcp: Invalid request type (not VERSION, TIME, USERINFO, SOURCE, or FINGER)")
+						t = Message(ERROR_MESSAGE,'',f"{script_file}, line {line_number}: {config.ISSUE_COMMAND_SYMBOL}ctcp: Invalid request type (not FINGER, PING, SOURCE, TIME, USERINFO, or VERSION)")
 						window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 					return True
-				t = Message(ERROR_MESSAGE,'',"Invalid request type (not VERSION, TIME, USERINFO, SOURCE, or FINGER)")
+				t = Message(ERROR_MESSAGE,'',"Invalid request type (not FINGER, PING, SOURCE, TIME, USERINFO, or VERSION)")
 				window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 				return True
 			window.client.ctcpMakeQuery(target, [(request, args)])
@@ -6513,34 +6514,6 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 					window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 				return True
 			t = Message(ERROR_MESSAGE,'',"Usage: "+config.ISSUE_COMMAND_SYMBOL+"ctcp REQUEST USER")
-			window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
-			return True
-
-	# |-------|
-	# | /ping |
-	# |-------|
-	if len(tokens)>=1:
-		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'ping' and len(tokens)==2:
-			tokens.pop(0)
-			target = tokens.pop(0)
-			window.client.ping(target)
-			return True
-
-		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'ping' and len(tokens)>2:
-			tokens.pop(0)
-			target = tokens.pop(0)
-			msg = ' '.join(tokens)
-			window.client.ping(target,msg)
-			return True
-
-		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'ping':
-			if is_script:
-				add_halt(script_id)
-				if config.DISPLAY_SCRIPT_ERRORS:
-					t = Message(ERROR_MESSAGE,'',f"{script_file}, line {line_number}: Usage: "+config.ISSUE_COMMAND_SYMBOL+"ping USER")
-					window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
-				return True
-			t = Message(ERROR_MESSAGE,'',"Usage: "+config.ISSUE_COMMAND_SYMBOL+"ping USER")
 			window.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 			return True
 

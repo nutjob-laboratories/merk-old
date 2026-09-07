@@ -400,6 +400,10 @@ class IRC_Connection(irc.IRCClient):
 			if ctype=="SOURCE":
 				self.gui.receivedClientSource(self,user,data)
 
+			if ctype=="PING":
+				self.gui.receivedClientPing(self,user,data)
+				return
+
 		return irc.IRCClient.ctcpReply(self, user, channel, messages)
 
 	def ctcpQuery(self, user, channel, messages):

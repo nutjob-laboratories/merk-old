@@ -107,7 +107,7 @@ All of these commands can be issued in the client or from scripts, unless otherw
 | `/connect SERVER [PORT] [PASSWORD]`     | Connects to an IRC server                                                                                                        |
 | `/connectssl SERVER [PORT] [PASSWORD]`  | Connects to an IRC server via SSL                                                                                                |
 | `context [HOSTID] WINDOW_NAME`                  | Moves execution of the script to `WINDOW_NAME`. To specify what server `WINDOW_NAME` is connected to, pass a `HOSTID` as the first argument. *Can only be called from scripts*                                                  |
-| `/ctcp REQUEST USER`                  | Sends a CTCP request to `USER`; valid `REQUEST`s are TIME, VERSION, USERINFO, SOURCE, or FINGER                                                  |
+| `/ctcp REQUEST USER`                  | Sends a CTCP request to `USER`; valid `REQUEST`s are FINGER, PING, SOURCE, TIME, USERINFO, or VERSION                                                  |
 | `decimal ALIAS LOW HIGH MESSAGE...`     | Requests a decimal number from the user, between `LOW` and `HIGH`, in a dialog (with `MESSAGE`), and stores the input in `ALIAS`. If the user cancels the dialog, `ALIAS` will be set to `*`. This command is blocking. *Can only be called by scripts*    |
 | `/delay SECONDS COMMAND...`                  | Executes `COMMAND` after `SECONDS` seconds                                                 |
 | `/deop [CHANNEL] NICKNAME [NICKNAME...]`               | Removes channel operator status from `NICKNAME`(s)           |
@@ -159,7 +159,6 @@ All of these commands can be issued in the client or from scripts, unless otherw
 | `/op [CHANNEL] NICKNAME [NICKNAME...]`               | Sets channel operator status on `NICKNAME`(s)           |
 | `/oper USERNAME PASSWORD`               | Logs into an operator account                                                                                                    |
 | `/part CHANNEL [MESSAGE]`               | Leaves a channel                                                                                                                 |
-| `/ping USER [TEXT]`                     | Sends a CTCP ping to a user                                                                                                      |
 | `/play FILENAME`                        | Plays a WAV file                                                                                                                 |
 | `pool`                        | Ends a `loop` block. *Can only be called from scripts*      |
 | `/print [SERVER] [WINDOW] TEXT...`               | Prints text to a subwindow. `SERVER` is optional if `WINDOW` belongs to the same context. Pass `*` as `SERVER` to print to all open subwindows. Pass `*` as `WINDOW` to print to the server subwindow                                                                       |

@@ -1434,66 +1434,86 @@ class Merk(QMainWindow):
 	def receivedClientVersion(self,client,user,msg):
 		s = self.getServerWindow(client)
 		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received version from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP VERSION reply from {user}: {msg}")
 			s.writeText(t)
 
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received version from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP VERSION reply from {user}: {msg}")
 			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientTime(self,client,user,msg):
 		s = self.getServerWindow(client)
 		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received time from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP TIME reply from {user}: {msg}")
 			s.writeText(t)
 
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received time from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP TIME reply from {user}: {msg}")
 			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientFinger(self,client,user,msg):
 		s = self.getServerWindow(client)
 		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received finger from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP FINGER reply from {user}: {msg}")
 			s.writeText(t)
 
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received finger from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP FINGER reply from {user}: {msg}")
 			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientUserinfo(self,client,user,msg):
 		s = self.getServerWindow(client)
 		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received userinfo from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP USERINFO reply from {user}: {msg}")
 			s.writeText(t)
 
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received userinfo from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP USERINFO reply from {user}: {msg}")
 			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientSource(self,client,user,msg):
 		s = self.getServerWindow(client)
 		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received source from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP SOURCE reply from {user}: {msg}")
 			s.writeText(t)
 
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received source from {user}: {msg}")
+			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP SOURCE reply from {user}: {msg}")
+			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+
+	def receivedClientPing(self,client,user,data):
+		s = self.getServerWindow(client)
+		if data==None: data=''
+		if s:
+			if len(data.strip())>0:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {data}")
+			else:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}")
+			s.writeText(t)
+
+		w = self.MDI.activeSubWindow()
+		if w:
+			c = w.widget()
+			if c==s: return
+			if len(data.strip())>0:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {data}")
+			else:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}")
 			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedPong(self,client,user,seconds):

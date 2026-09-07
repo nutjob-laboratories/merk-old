@@ -164,7 +164,7 @@ Appearance:
 </tr>
 <tr>
 <td><code>/ctcp REQUEST USER</code></td>
-<td>Sends a CTCP request to <code>USER</code>; valid <code>REQUEST</code>s are TIME, VERSION, USERINFO, SOURCE, or FINGER</td>
+<td>Sends a CTCP request to <code>USER</code>; valid <code>REQUEST</code>s are FINGER, PING, SOURCE, TIME, USERINFO, or VERSION</td>
 </tr>
 <tr>
 <td><code>decimal ALIAS LOW HIGH MESSAGE...</code></td>
@@ -369,10 +369,6 @@ Appearance:
 <tr>
 <td><code>/part CHANNEL [MESSAGE]</code></td>
 <td>Leaves a channel</td>
-</tr>
-<tr>
-<td><code>/ping USER [TEXT]</code></td>
-<td>Sends a CTCP ping to a user</td>
 </tr>
 <tr>
 <td><code>/play FILENAME</code></td>

@@ -543,6 +543,8 @@ class Window(QMainWindow):
 
 		self.dump = LogViewer()
 		self.dump.setReadOnly(True)
+		self.dump.setContextMenuPolicy(Qt.CustomContextMenu)
+		self.dump.customContextMenuRequested.connect(self.dumpMenu)
 
 		size_policy = self.dump.sizePolicy()
 		size_policy.setVerticalPolicy(QSizePolicy.Expanding)
@@ -649,6 +651,9 @@ class Window(QMainWindow):
 
 		self.buildList()
 
+		self.shortcut = QShortcut(QKeySequence("Ctrl+X"), self.dump)
+		self.shortcut.activated.connect(self.copy_modified)
+
 		managerLayout = QHBoxLayout()
 		managerLayout.addWidget(self.horizontalSplitter)
 
@@ -664,6 +669,58 @@ class Window(QMainWindow):
 
 		self.setWindowFlags(self.windowFlags()
 					^ QtCore.Qt.WindowContextHelpButtonHint)
+
+	def dumpMenu(self,location):
+		menu = QMenu(self.dump)
+
+		cursor = self.dump.textCursor()
+		has_selection = cursor.hasSelection()
+
+		copy_action = QAction(QIcon(COPY_ICON),"Copy", menu)
+		copy_action.setShortcut("Ctrl+C")
+		copy_action.setEnabled(has_selection)
+
+		copy_action.triggered.connect(self.copy)
+		menu.addAction(copy_action)
+
+		copy_action = QAction(QIcon(HIDE_ICON),"Copy plain text", menu)
+		copy_action.setShortcut("Ctrl+X")
+		copy_action.setEnabled(has_selection)
+
+		copy_action.triggered.connect(self.copy_modified)
+		menu.addAction(copy_action)
+
+		menu.addSeparator()
+
+		# Select all
+		select_all_action = QAction(QIcon(SELECTALL_ICON),"Select All", menu)
+		select_all_action.setShortcut("Ctrl+A")
+		select_all_action.triggered.connect(self.dump.selectAll)
+		menu.addAction(select_all_action)
+
+		action = menu.exec_(self.dump.mapToGlobal(location))
+
+	def copy(self):
+		cursor = self.dump.textCursor()
+
+		if not cursor.hasSelection():
+			return
+
+		text = cursor.selectedText()
+
+		QApplication.clipboard().setText(text)
+
+	def copy_modified(self):
+		cursor = self.dump.textCursor()
+
+		if not cursor.hasSelection():
+			return
+
+		text = cursor.selectedText()
+
+		text = strip_color(text)
+
+		QApplication.clipboard().setText(text)
 
 	def generateStylesheet(self,obj,fore,back):
 
