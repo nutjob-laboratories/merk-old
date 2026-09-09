@@ -1432,6 +1432,12 @@ class Merk(QMainWindow):
 					w.writeText(t)
 
 	def receivedClientVersion(self,client,user,msg):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
 		s = self.getServerWindow(client)
 		if s:
 			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP VERSION reply from {user}: {msg}")
@@ -1441,10 +1447,17 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP VERSION reply from {user}: {msg}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP VERSION reply from {user}: {msg}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientTime(self,client,user,msg):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
 		s = self.getServerWindow(client)
 		if s:
 			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP TIME reply from {user}: {msg}")
@@ -1454,10 +1467,17 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP TIME reply from {user}: {msg}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP TIME reply from {user}: {msg}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientFinger(self,client,user,msg):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
 		s = self.getServerWindow(client)
 		if s:
 			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP FINGER reply from {user}: {msg}")
@@ -1467,10 +1487,17 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP FINGER reply from {user}: {msg}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP FINGER reply from {user}: {msg}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientUserinfo(self,client,user,msg):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
 		s = self.getServerWindow(client)
 		if s:
 			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP USERINFO reply from {user}: {msg}")
@@ -1480,10 +1507,17 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP USERINFO reply from {user}: {msg}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP USERINFO reply from {user}: {msg}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientSource(self,client,user,msg):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
 		s = self.getServerWindow(client)
 		if s:
 			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP SOURCE reply from {user}: {msg}")
@@ -1493,10 +1527,41 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received CTCP SOURCE reply from {user}: {msg}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP SOURCE reply from {user}: {msg}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedClientPing(self,client,user,data):
+
+		if not config.SHOW_FULL_USER_IN_CTCP_REPLY:
+			p = user.split('!')
+			if len(p)==2:
+				user = p[0]
+
+		if data in client.pings:
+			timestamp1 = client.pings[data]
+			timestamp2 = time.time()
+
+			difference_milliseconds = (timestamp2 - timestamp1) * 1000
+
+			client.pings.pop(data,'')
+
+			s = self.getServerWindow(client)
+			if data==None: data=''
+			if s:
+				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {difference_milliseconds:.4f}ms")
+				s.writeText(t)
+
+			w = self.MDI.activeSubWindow()
+			if w:
+				c = w.widget()
+				if c==s: return
+				if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+					t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {difference_milliseconds:.4f}ms")
+					c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+
+			return
+
 		s = self.getServerWindow(client)
 		if data==None: data=''
 		if s:
@@ -1510,25 +1575,12 @@ class Merk(QMainWindow):
 		if w:
 			c = w.widget()
 			if c==s: return
-			if len(data.strip())>0:
-				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {data}")
-			else:
-				t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
-
-	def receivedPong(self,client,user,seconds):
-
-		s = self.getServerWindow(client)
-		if s:
-			t = Message(SYSTEM_MESSAGE,'',f"Received pong from {user}: {seconds} seconds")
-			s.writeText(t)
-
-		w = self.MDI.activeSubWindow()
-		if w:
-			c = w.widget()
-			if c==s: return
-			t = Message(SYSTEM_MESSAGE,'',f"Received pong from {user}: {seconds} seconds")
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				if len(data.strip())>0:
+					t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}: {data}")
+				else:
+					t = Message(SYSTEM_MESSAGE,'',f"Received CTCP PING reply from {user}")
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def receivedMOTD(self,client,motd):
 		plugins.call(self,"motd",text="\n".join(motd),client=client)
@@ -2255,6 +2307,8 @@ class Merk(QMainWindow):
 		plugins.call(self,"unmode",client=client,user=user,target=target,mode=mode,arguments=argument)
 
 	def userKicked(self,client,kickee,channel,kicker,message):
+
+		if message==client.nickname: message = ''
 		
 		if len(message)>0:
 			t = Message(SYSTEM_MESSAGE,'',kicker+" kicked "+kickee+" from "+channel+" ("+message+")")
@@ -2324,6 +2378,7 @@ class Merk(QMainWindow):
 		if client.registered==False and code=="461":
 			if not config.SHOW_ALL_SERVER_ERRORS: return
 
+		# Don't show errors from the "auto-fetch hostmasks" feature
 		if code=="401":
 			for nick in client.request_whois:
 				if f"{nick}:" in message and 'No such' in message:
@@ -2389,9 +2444,10 @@ class Merk(QMainWindow):
 				else:
 					m = Message(SERVER_MESSAGE,'', f"{client.server}:{client.port}: {e}")
 				w.writeText(m)
-				if a:
-					c = a.widget()
-					c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+		if a:
+			c = a.widget()
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def luserInfo(self,client,data):
 		m = Message(SERVER_MESSAGE,'', data)
@@ -2400,27 +2456,28 @@ class Merk(QMainWindow):
 			w.writeText(m)
 		if client.registered:
 			if config.SHOW_LUSER_INFO_IN_CURRENT_WINDOW:
-				w = self.MDI.activeSubWindow()
-				if w:
-					c = w.widget()
-					c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+				a = self.MDI.activeSubWindow()
+				if a:
+					if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+						c = a.widget()
+						c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def linksInfo(self,client,data):
 		if len(data)==0: return
+		w = self.getServerWindow(client)
+		if w:
+			for d in data:
+				e = f"{d[1]} ({d[0]}) - {d[2]}"
+				m = Message(SERVER_MESSAGE,'', e)
+				w.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			for d in data:
-				e = f"{d[1]} ({d[0]}) - {d[2]}"
-				m = Message(SERVER_MESSAGE,'', e)
-				c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
-		w = self.getServerWindow(client)
-		if w:
-			c = w.widget()
-			for d in data:
-				e = f"{d[1]} ({d[0]}) - {d[2]}"
-				m = Message(SERVER_MESSAGE,'', e)
-				c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				for d in data:
+					e = f"{d[1]} ({d[0]}) - {d[2]}"
+					m = Message(SERVER_MESSAGE,'', e)
+					c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def isonInfo(self,client,data):
 		plugins.call(self,"ison",client=client,users=data)
@@ -2433,16 +2490,18 @@ class Merk(QMainWindow):
 			w = self.MDI.activeSubWindow()
 			if w:
 				c = w.widget()
-				c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+				if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+					c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def infoInfo(self,client,data):
 		if len(data)==0: return
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			for d in data:
-				m = Message(SERVER_MESSAGE,'', d)
-				c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				for d in data:
+					m = Message(SERVER_MESSAGE,'', d)
+					c.writeText(m,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 		s = self.getServerWindow(client)
 		if s:
 			for d in data:
@@ -2454,7 +2513,8 @@ class Merk(QMainWindow):
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			c.writeText(d,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				c.writeText(d,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 		w = self.getServerWindow(client)
 		if w:
 			w.writeText(d)
@@ -2488,29 +2548,49 @@ class Merk(QMainWindow):
 		else:
 			wd.append(Message(WHOIS_MESSAGE,displaynick, "\x02is not a bot\x0F"))
 
+		w = self.getServerWindow(client)
+		if w:
+			for msg in wd:
+				w.writeText(msg,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			for msg in wd:
-				c.writeText(msg,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				for msg in wd:
+					c.writeText(msg,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def who(self,client,nick,whodata):
 
+		w = self.getServerWindow(client)
+		if w:
+			for entry in whodata:
+				t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.channel+"\x0F ("+entry.server+")")
+				w.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			for entry in whodata:
-				t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.channel+"\x0F ("+entry.server+")")
-				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				for entry in whodata:
+					t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.channel+"\x0F ("+entry.server+")")
+					c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def whowas(self,client,nick,whodata):
 
+		w = self.getServerWindow(client)
+		if w:
+			for entry in whodata:
+				t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.realname+"\x0F")
+				w.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			for entry in whodata:
-				t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.realname+"\x0F")
-				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				for entry in whodata:
+					t = Message(WHOIS_MESSAGE,nick, entry.username+"@"+entry.host+": \x02"+entry.realname+"\x0F")
+					c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 	def invited(self,client,user,channel):
 		plugins.call(self,"invite",client=client,user=user,channel=channel)
@@ -2540,8 +2620,9 @@ class Merk(QMainWindow):
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			t = Message(SYSTEM_MESSAGE,'', user+" invited you to "+channel)
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'', user+" invited you to "+channel)
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 		w = self.getServerWindow(client)
 		if w:
@@ -2556,8 +2637,9 @@ class Merk(QMainWindow):
 		w = self.MDI.activeSubWindow()
 		if w:
 			c = w.widget()
-			t = Message(SYSTEM_MESSAGE,'', "You invited "+user+" to "+channel)
-			c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
+			if c.window_type==CHANNEL_WINDOW or c.window_type==SERVER_WINDOW or c.window_type==PRIVATE_WINDOW:
+				t = Message(SYSTEM_MESSAGE,'', "You invited "+user+" to "+channel)
+				c.writeText(t,config.LOG_ABSOLUTELY_ALL_MESSAGES_OF_ANY_TYPE)
 
 		w = self.getServerWindow(client)
 		if w:
@@ -5845,19 +5927,37 @@ class Merk(QMainWindow):
 								else:
 									desc = "<b>IRC Network</b>"
 
+								display_shown = False
 								if mynet.lower()!=config.UNKNOWN_NETWORK_NAME.lower():
 									wentry = widgets.ExtendedMenuItemNoAction(self,CONNECT_MENU_ICON,mynet,desc,CUSTOM_MENU_ICON_SIZE)
 									sm.addAction(wentry)
+									display_shown = True
+
+								disconnect_entry = QAction(QIcon(DISCONNECT_WINDOW_ICON),"Disconnect from server",self)
+								disconnect_entry.triggered.connect(c.disconnect)
+								f = disconnect_entry.font()
+								f.setBold(True)
+								disconnect_entry.setFont(f)
 
 								show_sep = False
 								separator = sm.addSeparator()
 								separator.setVisible(False)
 
 								if config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU:
-									wentry = QAction(QIcon(CHANNEL_ICON),"Join a channel",self)
+									wentry = QAction(QIcon(CHANNEL_ICON),"Join channel",self)
 									wentry.triggered.connect(c.joinChannel)
 									sm.addAction(wentry)
 
+									show_sep = True
+
+								if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU:
+									wentry = QAction(QIcon(LIST_ICON),"Search channel list",self)
+									wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
+									sm.addAction(wentry)
+
+									show_sep = True
+
+								if config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU:
 									wentry = QAction(QIcon(PRIVATE_ICON),"Change nickname",self)
 									wentry.triggered.connect(c.changeNick)
 									sm.addAction(wentry)
@@ -5873,13 +5973,6 @@ class Merk(QMainWindow):
 									sm.addAction(wentry)
 
 									show_sep = True
-								
-								if config.SHOW_CHANNEL_LIST_IN_WINDOWS_MENU:
-									wentry = QAction(QIcon(LIST_ICON),"Search channel list",self)
-									wentry.triggered.connect(lambda state,u=sw: self.menuChannelList(u))
-									sm.addAction(wentry)
-
-									show_sep = True
 
 								if config.SHOW_LOGS_IN_WINDOWS_MENU and (len(os.listdir(logs.LOG_DIRECTORY))>0):
 									if len(logs.find_network_logs(f"{mynet}"))>0:
@@ -5890,7 +5983,7 @@ class Merk(QMainWindow):
 										show_sep = True
 
 								if config.SHOW_SCRIPTING_IN_WINDOWS_MENU and config.ENABLE_SCRIPTING_ENGINE:
-									wentry = QAction(QIcon(RUN_ICON),"Run a script",self)
+									wentry = QAction(QIcon(RUN_ICON),"Run script on server window",self)
 									wentry.triggered.connect(c.scriptDialog)
 									sm.addAction(wentry)
 
@@ -5918,24 +6011,33 @@ class Merk(QMainWindow):
 									if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
 										win_total = win_total + 1
 
-								e = textSeparator(self,f"subwindow{'s' if win_total>1 else ''}")
-								sm.addAction(e)
+								if not display_shown and not show_sep:
+									separator.setVisible(True)
+								else:
+									if registered_connections>1:
+										e = textSeparator(self,f"subwindow{'s' if win_total>1 else ''}")
+										sm.addAction(e)
 
-								# Server subwindow
-								for w in irc_windows:
-									if w==sw:
-										sm.addAction(irc_windows[w])
+								if registered_connections>1:
+									# Server subwindow
+									for w in irc_windows:
+										if w==sw:
+											sm.addAction(irc_windows[w])
 
-								# Channel and private chat subwindows
-								for w in wl:
-									for chat in irc_windows:
-										if chat==w:
-											sm.addAction(irc_windows[chat])
+									# Channel and private chat subwindows
+									for w in wl:
+										for chat in irc_windows:
+											if chat==w:
+												sm.addAction(irc_windows[chat])
 
-								# Channel list window for the server
-								for c in irc_windows:
-									if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
-										sm.addAction(irc_windows[c])
+									# Channel list window for the server
+									for c in irc_windows:
+										if c.widget().window_type==LIST_WINDOW and c.widget().client==sw.widget().client:
+											sm.addAction(irc_windows[c])
+
+								sm.addSeparator()
+
+								sm.addAction(disconnect_entry)
 
 		self.windowsMenu.addSeparator()
 

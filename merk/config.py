@@ -488,12 +488,13 @@ MINIMUM_FONT_SIZE = 8
 SHOW_STATUS_IN_USERLIST_MENU = False
 SHOW_FILE_EDITING_IN_TOOLS = True
 SHOW_RESTART_IN_SETTINGS_MENU = False
-
 SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = True
 SHOW_AWAY_IN_WINDOWS_MENU = True
+SHOW_FULL_USER_IN_CTCP_REPLY = False
 
 def build_settings():
 	settings = {
+		"show_full_user_data_in_ctcp_reply": SHOW_FULL_USER_IN_CTCP_REPLY,
 		"show_join_and_nick_in_windows_menu": SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU,
 		"show_away_control_in_windows_menu": SHOW_AWAY_IN_WINDOWS_MENU,
 		"show_restart_in_settings_menu": SHOW_RESTART_IN_SETTINGS_MENU,
@@ -943,6 +944,8 @@ def build_settings():
 	return settings
 
 def patch_settings(settings):
+	if not "show_full_user_data_in_ctcp_reply" in settings:
+		settings["show_full_user_data_in_ctcp_reply"] = SHOW_FULL_USER_IN_CTCP_REPLY
 	if not "show_join_and_nick_in_windows_menu" in settings:
 		settings["show_join_and_nick_in_windows_menu"] = SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU
 	if not "show_away_control_in_windows_menu" in settings:
@@ -2279,6 +2282,7 @@ def load_settings(filename):
 	global SHOW_RESTART_IN_SETTINGS_MENU
 	global SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU
 	global SHOW_AWAY_IN_WINDOWS_MENU
+	global SHOW_FULL_USER_IN_CTCP_REPLY
 
 	if os.path.isfile(filename):
 		with open(filename, "r") as read_settings:
@@ -2288,6 +2292,7 @@ def load_settings(filename):
 		settings = patch_settings(settings)
 		postpatch_length = len(settings)
 
+		SHOW_FULL_USER_IN_CTCP_REPLY = settings["show_full_user_data_in_ctcp_reply"]
 		SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = settings["show_join_and_nick_in_windows_menu"]
 		SHOW_AWAY_IN_WINDOWS_MENU = settings["show_away_control_in_windows_menu"]
 		SHOW_RESTART_IN_SETTINGS_MENU = settings["show_restart_in_settings_menu"]

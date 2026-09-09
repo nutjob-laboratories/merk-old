@@ -524,6 +524,14 @@ class UserMacro:
 		
 # Functions
 
+def random_alphanumeric_string(length):
+	return ''.join(
+		random.choices(
+			string.ascii_letters + string.digits,
+			k=length
+		)
+	)
+
 def emojize(text,language):
 	text = emoji.emojize(text,language=language)
 	return text

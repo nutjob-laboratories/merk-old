@@ -5008,6 +5008,10 @@ class Dialog(QDialog):
 		if config.ALWAYS_USE_SASL_LOGINS: self.useSasl.setChecked(True)
 		self.useSasl.stateChanged.connect(self.changedSetting)
 
+		self.showFullUser = QCheckBox("Show full user data in CTCP replies",self)
+		if config.SHOW_FULL_USER_IN_CTCP_REPLY: self.showFullUser.setChecked(True)
+		self.showFullUser.stateChanged.connect(self.changedSetting)
+
 		lspacer = QLabel()
 		lspacer.setFixedWidth(self.doConnectionTimeout.style().pixelMetric(QStyle.PM_IndicatorWidth) * 2)
 
@@ -5040,6 +5044,7 @@ class Dialog(QDialog):
 		afLayout.addWidget(self.showNetLinks)
 		afLayout.addWidget(self.ircErrors)
 		afLayout.addWidget(self.ircAllErrors)
+		afLayout.addWidget(self.showFullUser)
 		afLayout.addWidget(self.requestList)
 		afLayout.addWidget(self.showList)
 		afLayout.addLayout(refreshLayout)
@@ -5050,7 +5055,7 @@ class Dialog(QDialog):
 		self.erroneousDescription = QLabel(f"""
 			<small>
 			If your <b>nickname</b> "breaks" the rules of a given <b>server</b>, this is the <b>nickname</b> that will
-			be used during the connection process, limited to 8 characters. The
+			be used, limited to 8 characters. The
 			default is <b>Guest</b>.<br>
 			</small>
 			""")
@@ -7906,6 +7911,7 @@ class Dialog(QDialog):
 		config.SHOW_RESTART_IN_SETTINGS_MENU = self.showRestart.isChecked()
 		config.SHOW_AWAY_IN_WINDOWS_MENU = self.showAwayControls.isChecked()
 		config.SHOW_JOIN_AND_NICK_IN_WINDOWS_MENU = self.showJoinNick.isChecked()
+		config.SHOW_FULL_USER_IN_CTCP_REPLY = self.showFullUser.isChecked()
 		
 		if config.DECODING_TYPE!=self.DECODING_TYPE:
 			changed_main_codec = True

@@ -6483,17 +6483,18 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 			args = ' '.join(tokens)
 
 			if request=="VERSION":
-				pass
+				args = ''
 			elif request=="TIME":
-				pass
+				args = ''
 			elif request=="FINGER":
-				pass
+				args = ''
 			elif request=="USERINFO":
-				pass
+				args = ''
 			elif request=="SOURCE":
-				pass
+				args = ''
 			elif request=="PING":
-				pass
+				if args.strip()=='': args = random_alphanumeric_string(8)
+				window.client.pings[args] = time.time()
 			else:
 				if is_script:
 					add_halt(script_id)
@@ -8811,7 +8812,6 @@ def executeCommonCommands(gui,window,user_input,is_script,line_number=0,script_i
 			tokens.pop(0)
 			nick = tokens.pop(0)
 			window.client.sendLine(f"WHO {nick}")
-			print(nick)
 			return True
 		if tokens[0].lower()==config.ISSUE_COMMAND_SYMBOL+'who' and len(tokens)==3:
 			tokens.pop(0)

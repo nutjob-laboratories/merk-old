@@ -230,6 +230,7 @@ class IRC_Connection(irc.IRCClient):
 		self.banlists = defaultdict(list)
 		self.batch = []
 		self.logged_in_via_sasl = False
+		self.pings = {}
 
 		if user.USERINFO=='':
 			self.userinfo = None
@@ -428,9 +429,6 @@ class IRC_Connection(irc.IRCClient):
 
 		return irc.IRCClient.ctcpQuery(self, user, channel, messages)
 
-	def pong(self,user,seconds):
-		self.gui.receivedPong(self,user,seconds)
-
 	def luserChannels(self,channels):
 		try:
 			ccount = int(channels)
@@ -529,6 +527,10 @@ class IRC_Connection(irc.IRCClient):
 						self.sendLine("WHOIS "+nick)
 
 		self.gui.uptime(self,self.uptime)
+
+		# Remove ping requests that are 2 minutes or older
+		for p in self.pings:
+			if ((time.time() - self.pings[p]) * 1000)>=120000: self.pings.pop(p,'')
 
 	def connectionMade(self):
 

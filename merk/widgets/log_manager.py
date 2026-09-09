@@ -160,12 +160,20 @@ class Window(QMainWindow):
 			backup_action.triggered.connect(lambda: self.backup_log(item))
 			menu.addAction(backup_action)
 
-			if item.large_log==False: backup_action.setEnabled(False)
+			if item.large_log==False:
+				backup_action.setEnabled(False)
+			else:
+				f = backup_action.font()
+				f.setBold(True)
+				backup_action.setFont(f)
 
 			menu.addSeparator()
 
 			delete_action = QAction(QIcon(CLOSE_ICON),"Delete log file", self)
 			delete_action.triggered.connect(lambda: self.delete_log(item))
+			f = delete_action.font()
+			f.setBold(True)
+			delete_action.setFont(f)
 			menu.addAction(delete_action)
 
 			menu.exec_(self.packlist.mapToGlobal(position))

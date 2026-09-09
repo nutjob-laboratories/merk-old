@@ -36,6 +36,7 @@ import random
 from datetime import datetime, timezone
 import html
 import shlex
+import time
 
 import emoji
 
@@ -1528,7 +1529,7 @@ class Window(QMainWindow):
 					ctcpMenu.addAction(act)
 
 					act = QAction(QIcon(NETWORK_ICON),"PING", self)
-					act.triggered.connect(lambda : self.client.ctcpMakeQuery(self.name, [('PING', '')]))
+					act.triggered.connect(lambda : self.sendCTCPPing(self.name))
 					ctcpMenu.addAction(act)
 
 					act = QAction(QIcon(CONSOLE_ICON),"SOURCE", self)
@@ -2874,7 +2875,7 @@ class Window(QMainWindow):
 			ctcpMenu.addAction(act)
 
 			act = QAction(QIcon(CONNECT_ICON),"PING", self)
-			act.triggered.connect(lambda : self.client.ctcpMakeQuery(user_nick, [('PING', '')]))
+			act.triggered.connect(lambda : self.sendCTCPPing(user_nick))
 			ctcpMenu.addAction(act)
 
 			if config.ENABLE_IGNORE:
@@ -3008,6 +3009,11 @@ class Window(QMainWindow):
 			opMenu.addAction(act)
 
 		self.userlist_menu.exec_(self.userlist.mapToGlobal(position))
+
+	def sendCTCPPing(self,user_nick):
+		args = random_alphanumeric_string(8)
+		self.client.pings[args] = time.time()
+		self.client.ctcpMakeQuery(user_nick, [('PING', args)])
 
 	def loadScript(self,directly_execute=False):
 		options = QFileDialog.Options()

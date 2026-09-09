@@ -2,6 +2,13 @@
 |                                   0.052.300                                  |
 |------------------------------------------------------------------------------|
 
+What's new:
+
+- **Many icons have been changed**. The icons for "open file", "folder", "bold" and "italics", "new file", "save", and "save as" are all new, from the public domain Tango icon set.
+- **Log snippets can be copied from the Log Manager with color/formatting stripped**. Use the "Ctrl+X" shortcut in the Log Manager to copy text from the log viewer with all IRC colors/formatting stripped from the text.
+- **Results from `/ctcp PING` now show the round-trip time the request took in milliseconds**. Showing a user's full username (`nickname!hostmask`) in CTCP replies can now be toggled; this is turned off by default, and will only display the user's nickname.
+- **Many bugfixes**.
+
 |==============================================================================|
 |                              APPLICATION CHANGES                             |
 |==============================================================================|
@@ -39,6 +46,20 @@
 * Bugfix: the IRC client can now handle malformed PING replies without
   displaying an error message.
 * Bugfix: the IRC client now handles CTCP PING replies properly.
+* Bugfix: the "smaller font" point size in the text style dialog could be not
+  set in certain circumstances.
+* Bugfix: fixed the "/links" command.
+* Bugfix: several commands were potentially vulnerable to a race condition.
+* The "/whois", "/whowas", and "/who" commands now also write their output to
+  the server window.
+* Bugfix: the "/who" command could print to STDOUT for no reason.
+* Removed support for the WebSocket "pong" event.
+* The "/ctcp PING" command now tracks how long it took the PING to return to
+  to the client, and displays that time in milliseconds to the user.
+* Bugfix: the "/ctcp" command could pass unneeded arguments.
+* CTCP replies no longer display the user's "full" username (nick!hostmask).
+* Added an option to toggle showing "full" user data in CTCP replies to the
+  "Settings" dialog.
 
 |==============================================================================|
 |                              PLUGIN API CHANGES                              |
